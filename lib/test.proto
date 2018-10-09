@@ -1,0 +1,49 @@
+/* ABOUT PROTOCOL BUFFERS
+* faster, more lightweight than XML
+* Google uses protobuf as the basis for custom RPC system
+* Code is generated using protoc compiler on .proto file
+* Useful when language interoperability is required
+* slower than thrift when not in speed mode cause the messages are smaller
+*/
+
+syntax = "proto2"; //proto3 has some odd tricks
+
+/* CODE GENERATION
+* protoc --proto_path=. --cpp_out=. test.proto
+* . stands for current folder
+* .proto file has to be given as the final argument
+*/
+
+//prevents naming conflicts between projects
+//C++ generated classes will have namespace that matches package name
+package tutorial;
+
+//message definitions
+//numbers at the end are tag numbers -> use them efficiently
+//since lower numbers need less bytes for encoding
+message Person 
+{
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+
+  enum PhoneType 
+  {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber 
+  {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+  repeated PhoneNumber phones = 4;
+}
+
+message AddressBook
+{
+  repeated Person people = 1;
+}
