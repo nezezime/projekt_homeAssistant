@@ -2,6 +2,6 @@
 
 int main(void)
 {
-  printf("Hello world from serviced");
+  printf("Hello world serviced");
   return 0;
 }
