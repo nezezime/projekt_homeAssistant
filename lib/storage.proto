@@ -1,0 +1,4 @@
+//Protocol buffer specification for storaged rpc server
+syntax = "proto3";
+
+
