@@ -1,4 +1,20 @@
 //Protocol buffer specification for storaged rpc server
 syntax = "proto3";
 
+package databaseRPC;
 
+service dbRPC
+{
+  //send hello
+  rpc Hello (HelloRequest) returns (HelloReply) {}
+}
+
+message HelloRequest
+{
+  string name = 1;
+}
+
+message HelloReply
+{
+  string message = 1;
+}
