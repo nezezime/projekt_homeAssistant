@@ -1,5 +1,5 @@
 //Protocol buffer specification for storaged rpc server
-syntax = "proto3";
+syntax = "proto2";
 
 package databaseRPC;
 
@@ -13,12 +13,12 @@ service dbRPC
 
 message HelloRequest
 {
-  string name = 1;
-  int32 message_id = 2;
+  optional string name = 1;
+  required int32 message_id = 2;
 }
 
 message HelloReply
 {
-  string message = 1;
-  int32 message_id = 2;
+  optional string message = 1;
+  required int32 message_id = 2;
 }
