@@ -3,7 +3,8 @@
 TODO
 - protospy
 - RPC s protobuf
-- ustrezno prevajanje in includanje lib
+  -> multithreaded RPC server je možen, implmentacija če ostane dovolj časa
+- includanje lib, generacija in uporaba protobuf/groc datotek direktno iz lib
 - basic wsdl za gsoap generacijo
 - podatkovna baza
 - multithreading
