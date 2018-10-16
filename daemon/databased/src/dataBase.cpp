@@ -1,6 +1,6 @@
 #include "dataBase.h"
 
-/************ FUNCTION PROTOTYPES ****************************************************************/
+/************************************* FUNCTION PROTOTYPES ***************************************/
 
 
 using grpc::Server;
@@ -11,7 +11,7 @@ using grpc::ServerWriter;
 using grpc::Status;
 using databaseRPC::dbRPC;
 
-/************ CLASS DEFINITIONS ******************************************************************/
+/************************************** CLASS DEFINITIONS *****************************************/
 
 /**
  * Implements all the service methods described in storage.proto by inheriting the Service class
@@ -20,16 +20,21 @@ using databaseRPC::dbRPC;
  */
 class dbRPCImpl final : public dbRPC::Service
 {
+public:
   //RPC Hello
-  Status Hello(::grpc::ClientContext* context,
-              const ::databaseRPC::HelloRequest& request,
-              ::databaseRPC::HelloReply* response)
+  Status Hello(ServerContext* context,
+              const ::databaseRPC::HelloRequest* request,
+              ::databaseRPC::HelloReply* response) override
   {
-    //TODO how to check if proto parameters are included in message
+    if(request->has_message_id() == false)
+    {
+      std::cout << "Hello RPC request missing message_id" << std::endl;
+      return Status(grpc::StatusCode::FAILED_PRECONDITION, "missing message_id");
+    }
 
-    int message_id = request.message_id();
+    int message_id = request->message_id();
     std::cout << "RPC server Hello id " << message_id << std::endl;
-    response->set_message_id(message_id);
+    response->set_message_id(1234);
     response->set_message("Server Hello");
     return Status::OK;
   }
@@ -44,11 +49,11 @@ int main(int argc, char **argv)
   return 0;
 }
 
-/************ FUNCTION DEFINITIONS ***************************************************************/
+/************************************ FUNCTION DEFINITIONS ***************************************/
 void database::RunServer(void)
 {
   std::string server_address("0.0.0.0:50051");
-  std::cout << "Starting databased RPC server @" << server_address << std::endl;
+  std::cout << "Starting databased RPC server" << std::endl;
 
   //instantaniation of RPC service implementation class
   //TODO v njihovem primeru so parsali se nek db file -> preveri, ce pride v postev zate
