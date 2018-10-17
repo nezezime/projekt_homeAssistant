@@ -3,9 +3,14 @@
 TODO
 - protospy
 - RPC s protobuf
-  -> preveri mozne vrednosti Status za gRPC + error handling
+  -> SSL na localhostu ne doda velikega varnostnega bonusa
   -> multithreaded RPC server je možen, implmentacija če ostane dovolj časa
-- includanje lib, generacija in uporaba protobuf/groc datotek direktno iz lib
+- proto interface specifikacija
+  -> auth data
 - basic wsdl za gsoap generacijo
 - podatkovna baza
 - multithreading
+- android aplikaicja
+  -> basic SOAP request/response 
+  -> SSL
+  -> avtentikacija
