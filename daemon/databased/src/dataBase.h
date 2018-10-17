@@ -14,8 +14,7 @@
 #include <grpcpp/server_context.h>
 #include <grpcpp/security/server_credentials.h>
 
-//includi zbuildane kode -> TODO popravi pot
-#include "../storage.grpc.pb.h"
+#include "storage.grpc.pb.h"
 
 namespace database
 {

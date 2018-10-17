@@ -17,7 +17,6 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 
-//includi zbuildane kode -> TODO popravi pot
-#include "../storage.grpc.pb.h"
+#include "storage.grpc.pb.h"
 
 #endif

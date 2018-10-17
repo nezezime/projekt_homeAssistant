@@ -1,63 +1,43 @@
-HOST_SYSTEM = $(shell uname | cut -f 1 -d_)
-SYSTEM ?= $(HOST_SYSTEM)
-CXX = g++
-CPPFLAGS += `pkg-config --cflags protobuf grpc`
-CXXFLAGS += -std=c++11
-
-ifeq ($(SYSTEM),Darwin)
-#linker flags
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -lgrpc++_reflection\
-           -ldl
-else
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl
-endif
-
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
-PROTOS_PATH = ../../lib/proto
+#flags --------------------------------------------------
 
-# search for path to .proto files in PROTOS_PATH
-vpath %.proto $(PROTOS_PATH)
+#compiler
+CXX = g++
 
-# non-protobuf flags ------------------------------------
-CFLAGS = -g -Wall -std=c++0x -DREMOTE_TESTING
+#compiler flags
+CFLAGS = -g -Wall -std=c++11 -DREMOTE_TESTING
+
+#make will look here for included library files
 INCPATH = -I./../../lib
-LIBPATH = -L/usr/local/include/grp -L/usr/local/include/grpc++
-#libraries to link
-LDLIBS = -llibgrpc++ -lprotobuf
 
-# to je definitivno narobe ker se mesajo .o in .cpp
-FILES = storage.pb.o storage.grpc.pb.o \
-				./src/dataBase.cpp
+#path to libraries
+LIBPATH = -L/usr/local/include/grp -L/usr/local/include/grpc++
+
+#linker flags
+LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
+           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
+           -ldl
+
+#libraries to link
+#LDLIBS = -llibgrpc++ -lprotobuf
+
+#file prerequisites for webservice recipe
+FILES = ../../lib/storage.pb.cc ../../lib/storage.grpc.pb.cc ./src/webService.cpp
 # -------------------------------------------------------
 
 all: system-check webservice
 
 # $^ - The names of all the prerequisites, with spaces between them
-#database: $(FILES) #FILES are the prerequisites for this rule. Ce je katerikoli file spremenjen se bo izvedel recept
-#	$(CXX) $^ $(LDFLAGS) -o database $(INCPATH) $(LIBPATH) $(FILES) $(LDLIBS)# command 1 in the recipe, TAB pomeni zacetek recepta
-#new line would mean a new command for the recipe -> za prelom vrstice uporabim backslash
-
-webservice: storage.pb.cc storage.grpc.pb.cc ./src/webService.cpp
-	$(CXX) $^ $(LDFLAGS) -o $@ $(LIBPATH)
-
-# generate protobuf code
-# $< pomeni first prerequisite
-
-%.grpc.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=. --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-
-%.pb.cc: %.proto
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=. $<
+webservice: $(FILES)
+	$(CXX) $(CFLAGS) $^ $(LDFLAGS) $(INCPATH) -o $@ $(LIBPATH)
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h webservice
+	rm -f webservice
 
+# does not need to be run every time
 # The following is to test your system and ensure a smoother experience.
 # They are by no means necessary to actually compile a grpc-enabled software.
 PROTOC_CMD = which $(PROTOC)
