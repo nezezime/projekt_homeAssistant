@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
@@ -44,6 +45,9 @@
 #include <jdbc/cppconn/exception.h>
 #include <jdbc/cppconn/resultset.h>
 #include <jdbc/cppconn/statement.h>
+
+//global constants
+constexpr char conf_file_name[] = "database.conf";
 
 namespace database
 {

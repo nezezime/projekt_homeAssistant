@@ -15,7 +15,6 @@ using databaseRPC::dbRPC;
 using namespace ::sql;
 
 
-
 /************************************** CLASS DEFINITIONS *****************************************/
 
 /**
@@ -48,27 +47,54 @@ public:
 int main(int argc, char **argv)
 {
   std::cout << "databased started" << std::endl;
+  std::string db_user = "";
+  std::string db_password = "";
 
-  //connect to database
-
-/* x DevAPI
-  try
+  //parse the config file
+  std::ifstream conf_file(conf_file_name);
+  if(conf_file.is_open())
   {
-    mysqlx::Session mySession(mysqlx::SessionOption::HOST, "192.168.1.2",
-                              //mysqlx::SessionOption::PORT, 3306,
-                              mysqlx::SessionOption::USER, "username",
-                              mysqlx::SessionOption::PWD, "password",
-                              mysqlx::SessionOption::DB, "home_assistant"
-                              );
-  }
-  catch(const ::mysqlx::Error &mysql_error)
-  {
-    std::cout << "mysql error caught: " << mysql_error << std::endl;
-    exit(1);
-  }
-*/
+    std::cout << "Reading config file" << std::endl;
+    std::string line;
 
-  //JDBC API
+    while(getline(conf_file, line))
+    {
+      //whitespace removal
+      line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+
+      if(line[0] == '#' || line.empty())
+      {
+        continue;
+      }
+
+      //split the line at the delimiter
+      int delimiterPos = line.find("=");
+      std::string tag = line.substr(0, delimiterPos);
+
+      if(tag.compare("user") == 0)
+      {
+        db_user = line.substr(delimiterPos + 1);
+
+      }
+      else if(tag.compare("password") == 0)
+      {
+        db_password = line.substr(delimiterPos + 1);
+      }
+      else
+      {
+        std::cout << "config file invalid argument" << std::endl;
+        return -1;
+      }
+    }
+  }
+  else
+  {
+    std::cout << "Could not open config file" << std::endl;
+    return -1;
+  }
+  std::cout << "u: " << db_user << " p: " << db_password << std::endl;
+
+  //connect to database using jdbc API
   try
   {
     sql::Driver * driver;
@@ -76,10 +102,8 @@ int main(int argc, char **argv)
     sql::Statement *stmt;
     sql::ResultSet *res;
 
-    /* Create a connection */
     driver = sql::mysql::get_mysql_driver_instance();
-    con = driver->connect("tcp://192.168.1.2:3306", "username", "password");
-    /* Connect to the MySQL test database */
+    con = driver->connect("tcp://192.168.1.2:3306", db_user, db_password);
     con->setSchema("home_assistant");
 
     stmt = con->createStatement();
@@ -89,10 +113,11 @@ int main(int argc, char **argv)
       std::cout << "\t... MySQL replies: ";
       /* Access column data by alias or column name */
       std::cout << res->getString("username") << std::endl;
-      std::cout << "\t... MySQL says it again: ";
       /* Access column data by numeric offset, 1 is the first column */
       std::cout << res->getString(1) << std::endl;
     }
+
+    //ne pozabi dealokacije, nekatere fje niso thread safe
   }
   catch(sql::SQLException &e)
   {
@@ -102,7 +127,6 @@ int main(int argc, char **argv)
     std::cout << " (MySQL error code: " << e.getErrorCode();
     std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
   }
-
 
 
   database::RunServer();
