@@ -8,18 +8,23 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 CXX = g++
 
 #compiler flags
+#c++11 is required for mysql connector
 CFLAGS = -g -Wall -std=c++11 -DREMOTE_TESTING
 
 #make will look here for included library files
-INCPATH = -I./../../lib
+INCPATH = -I./../../lib -I/usr/include/mysql-cppconn \
+					-I/usr/include/boost
 
 #path to libraries
-LIBPATH = -L/usr/local/include/grp -L/usr/local/include/grpc++
+LIBPATH = -L/usr/local/include/grpc -L/usr/local/include/grpc++ \
+					-L/usr/lib64
 
-#linker flags
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl
+#linker flags, -l specifies runtime libraries that are reqired
+LDFLAGS += -L/usr/local/lib -L /usr/include `pkg-config --libs protobuf grpc++` \
+           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed \
+           -ldl -lmysqlcppconn
+# za xdev je lmysqlcppconn8
+
 
 #libraries to link
 #LDLIBS = -llibgrpc++ -lprotobuf
