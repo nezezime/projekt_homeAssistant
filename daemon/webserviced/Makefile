@@ -11,31 +11,38 @@ CXX = g++
 CFLAGS = -g -Wall -std=c++11 -DREMOTE_TESTING
 
 #make will look here for included library files
-INCPATH = -I./../../lib
+INCPATH = -I./../../lib -I/usr/local/share/gsoap/import
 
 #path to libraries
-LIBPATH = -L/usr/local/include/grp -L/usr/local/include/grpc++
+LIBPATH = -L/usr/local/include/grpc -L/usr/local/include/grpc++ \
+					-L/home/bob/bin/lib
 
 #linker flags
-LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl
+LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++` \
+           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed \
+           -ldl -lgsoap++ -lpthread
 
 #libraries to link
 #LDLIBS = -llibgrpc++ -lprotobuf
 
 #file prerequisites for webservice recipe
+#TODO dodas se fajle ki jih zgenerira gSOAP + dodaj da se bo prevedlo s threadi
 FILES = ../../lib/storage.pb.cc ../../lib/storage.grpc.pb.cc ./src/webService.cpp
+
 # -------------------------------------------------------
 
 all: system-check webservice
 
 # $^ - The names of all the prerequisites, with spaces between them
 webservice: $(FILES)
-	$(CXX) $(CFLAGS) $^ $(LDFLAGS) $(INCPATH) -o $@ $(LIBPATH)
+	sh gsoap_create.sh
+	$(CXX) $(CFLAGS) $^ ./src/soapC.cpp ./src/soapHASOAPService.cpp $(LDFLAGS) $(INCPATH) -o $@ $(LIBPATH)
 
 clean:
 	rm -f webservice
+	rm -f webservice_gsoap.h
+	rm -f ./src/soap*
+	rm -f ./src/HASOAP.nsmap
 
 # does not need to be run every time
 # The following is to test your system and ensure a smoother experience.
