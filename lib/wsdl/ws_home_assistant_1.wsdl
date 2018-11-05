@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2019 (x64) (http://www.altova.com) by k (k) -->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ha="http://home-assistant.namespace/ha/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://home-assistant.namespace/ha/">
+	<wsdl:types>
+		<xsi:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema" targetNamespace="http://home-assistant.namespace/ha/" elementFormDefault="qualified">
+			<xsi:element name="GetDateTimeResponse" type="xsi:string"/>
+			<xsi:element name="GetDateTimeRequest" type="xsi:string"/>
+		</xsi:schema>
+	</wsdl:types>
+	<wsdl:message name="GetDateTimeRequest">
+		<wsdl:part name="parameter" element="ha:GetDateTimeRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetDateTimeResponse">
+		<wsdl:part name="parameter" element="ha:GetDateTimeResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="HAPort">
+		<wsdl:operation name="GetDateTime">
+			<wsdl:input message="ha:GetDateTimeRequest"/>
+			<wsdl:output message="ha:GetDateTimeResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="HASOAP" type="ha:HAPort">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetDateTime">
+			<soap12:operation soapAction="http://home-assistant.org/GetDateTime" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="HAServices">
+		<wsdl:port name="HASOAP" binding="ha:HASOAP">
+			<soap12:address location="http://home-assistant.org/soap/"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
