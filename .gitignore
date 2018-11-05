@@ -1,2 +1,5 @@
 # ignore all conf files
 *.conf
+
+# ignore reference wsdl file
+reference_wsdl.wsdl
