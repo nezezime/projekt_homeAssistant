@@ -1,9 +1,6 @@
 #include "webService.h"
 #include "HASOAP.nsmap"
 
-/************************************* FUNCTION PROTOTYPES ***************************************/
-
-
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -22,7 +19,7 @@ public:
     //std::cout << "client constructor" << std::endl;
   }
 
-  void RPC_Hello(void)
+  int RPC_Hello(void)
   {
     databaseRPC::HelloRequest request;
     databaseRPC::HelloReply reply;
@@ -36,11 +33,12 @@ public:
     if(result != 0)
     {
       std::cout << "RPC failed with error code " << result << std::endl;
-      return;
+      return result;
     }
 
     //parse response
     std::cout << "RPC response OK for message_id " << reply.message_id() << std::endl;
+    return 0;
   }
 
 private:
@@ -68,13 +66,14 @@ void *SoapProcessRequest(void * soap)
   return nullptr;
 }
 
+//global parameters
+//creates a gRPC stub and connect to gRPC channel without SSL
+//CreateCustomChannel adds more configuration options
+ClientDbRPC rpc_client_db(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
+
 int main(int argc, char **argv)
 {
   std::cout << "webserviced started" << std::endl;
-
-  //create a gRPC stub and connect to gRPC channel without SSL
-  //CreateCustomChannel adds more configuration options
-  ClientDbRPC rpc_client_db(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
 
   //call Hello RPC
   rpc_client_db.RPC_Hello();
@@ -90,7 +89,6 @@ int main(int argc, char **argv)
   //soap.accept_timeout = soap_accept_timeout; //stops SOAP server after set time of inactivity
   //soap.max_keep_alive = soap_max_keep_alive;
   pthread_t tid;
-
 
   //reuse address
   soap.bind_flags |= SO_REUSEADDR;
@@ -136,10 +134,29 @@ int main(int argc, char **argv)
   return 0;
 }
 
+
+/************************************ WEBSERVICES METHODS ****************************************/
 int HASOAPService::GetDateTime(const std::string& ha__GetDateTimeRequest, std::string &ha__GetDateTimeResponse)
 {
+  int result = 0;
   std::cout << "GetDateTime" << std::endl;
+
+  //fetch required data via rpc
+  result = rpc_client_db.RPC_Hello();
+  if(result != 0)
+  {
+    std::cout << "GetDateTime RPC error" << std::endl;
+    return WS_ERROR_RPC;
+  }
+
+  //parse RPC response
+
+  //construct soap response
+  auto t = std::time(nullptr);
+  auto tm = *std::localtime(&t);
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+  ha__GetDateTimeResponse.assign(oss.str());
+
   return 0;
 }
-
-/************************************ FUNCTION DEFINITIONS ***************************************/
