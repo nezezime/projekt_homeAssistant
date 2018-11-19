@@ -77,7 +77,6 @@ public class SoapWebserviceManager {
 
             result = (Object) envelope.bodyIn;
             String result_data = result.toString();
-
             Log.d("SOAP", result_data);
 
             /*try {
