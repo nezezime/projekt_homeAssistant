@@ -1,4 +1,3 @@
-
 package si.uni_lj.fe.tnuv.projekt_tnuv.soap_webservices;
 
 import android.content.Context;
@@ -7,6 +6,7 @@ import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.SoapFault;
+import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -45,11 +45,9 @@ public class SoapWebserviceManager {
         protected Void doInBackground(SoapRequest... soapRequests) {
             Log.d("JURE", "executing soap request");
             SoapObject soapRequest = new SoapObject(NAMESPACE, METHOD_NAME);
-            // soapRequest.addProperty("intA", "1");
-            // soapRequest.addProperty("intB", "2");
+            //soapRequest.addProperty("xmlns:ha", "http://home-assistant.namespace/ha");
 
             //serialize the request
-            //TODO use correct SOAP version
             SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER12);
             envelope.implicitTypes = true;
             envelope.setOutputSoapObject(soapRequest);
@@ -71,19 +69,28 @@ public class SoapWebserviceManager {
                 //e.printStackTrace();
             }
 
+
             //parse SOAP webservice response
-            //Object result = null;
+            Object result = null;
             SoapPrimitive soap_result = null;
-            try {
+            SoapObject result_object = null;
+
+            result = (Object) envelope.bodyIn;
+            String result_data = result.toString();
+
+            Log.d("SOAP", result_data);
+
+            /*try {
                 //result = (Object )envelope.getResponse();
-                envelope.getResponse();
+                //soap_result = (SoapPrimitive) envelope.getResponse();
+                //envelope.getResponse();
                 Log.d("JURE", "result retrieved");
                 //Log.d("JURE", String.valueOf(result)); // see output in the console
             } catch (SoapFault e) {
                 Log.e("SOAPLOG", e.getMessage());
                 //e.printStackTrace();
             }
-
+            */
             return null;
         }
     }
