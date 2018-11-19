@@ -20,6 +20,7 @@ import si.uni_lj.fe.tnuv.projekt_tnuv.MessageManagement.SoapRequest;
 
 public class SoapWebserviceManager {
 
+
     public SoapWebserviceManager() {
         //TODO Context is often passed to constructor
         Log.d("JURE", "soapWebserviceManager constructor");
