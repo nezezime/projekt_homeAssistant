@@ -54,4 +54,29 @@ namespace database
   void RunServer(void);
 }
 
+//automatically deallocates the sql statement and result on destruction
+class AutoSqlStmt
+{
+  public:
+  sql::Statement *stmt;
+  sql::ResultSet *result;
+
+  void executeQuery(const std::string query)
+  {
+    result = stmt->executeQuery(query);
+  }
+
+  AutoSqlStmt(sql::Connection *sql_connection)
+  {
+    stmt = sql_connection->createStatement();
+  };
+
+  ~AutoSqlStmt()
+  {
+    std::cout << "Sql statement and result deleted" << std::endl;
+    delete stmt;
+    delete result;
+  };
+};
+
 #endif

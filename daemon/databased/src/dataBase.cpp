@@ -1,8 +1,5 @@
 #include "dataBase.h"
 
-/************************************* FUNCTION PROTOTYPES ***************************************/
-
-
 using grpc::Server;
 using grpc::ServerContext;
 using grpc::ServerReader;
@@ -14,12 +11,15 @@ using databaseRPC::dbRPC;
 //using namespace std;
 using namespace ::sql;
 
+//global variables
+sql::Driver *sql_driver;
+sql::Connection *sql_connection;
 
 /************************************** CLASS DEFINITIONS *****************************************/
 
 /**
  * Implements all the service methods described in storage.proto by inheriting the Service class
- * @note: RPC methods are called from multiple threads at the same, the implementation must be
+ * @note: RPC methods are called from multiple threads at the same time, the implementation must be
  * thread safe!
  */
 class dbRPCImpl final : public dbRPC::Service
@@ -40,6 +40,41 @@ public:
     std::cout << "RPC server Hello id " << message_id << std::endl;
     response->set_message_id(1234);
     response->set_message("Server Hello");
+    return Status::OK;
+  }
+
+  //RPC GetUsers
+  Status GetUsers(::grpc::ServerContext* context,
+                const ::databaseRPC::GetUsersRequest* request,
+                ::databaseRPC::GetUsersResponse* response) override
+  {
+    if(request->has_session_id() == false)
+    {
+      std::cout << "GetUsers RPC request missing message_id" << std::endl;
+      return Status(grpc::StatusCode::FAILED_PRECONDITION, "missing message_id");
+    }
+
+    try
+    {
+      //read list of users from database
+      AutoSqlStmt auto_sql(sql_connection);
+      auto_sql.executeQuery("SELECT * FROM users");
+
+      //TODO parse results from database response and pass them to RPC response
+
+      while(auto_sql.result->next())
+      {
+        std::cout << "\t. ";
+        std::cout << auto_sql.result->getString("username") << std::endl;
+        std::cout << auto_sql.result->getString(1) << std::endl;
+      }
+    }
+    catch(sql::SQLException &e)
+    {
+      std::cout << "MySQL error code: " << e.getErrorCode() << std::endl;
+      return Status(grpc::StatusCode::INTERNAL, "database access error");
+    }
+
     return Status::OK;
   }
 };
@@ -97,27 +132,26 @@ int main(int argc, char **argv)
   //connect to database using jdbc API
   try
   {
-    sql::Driver * driver;
-    sql::Connection *con;
-    sql::Statement *stmt;
-    sql::ResultSet *res;
+    sql_driver = sql::mysql::get_mysql_driver_instance();
+    sql_connection = sql_driver->connect("tcp://192.168.1.2:3306", db_user, db_password);
+    sql_connection->setSchema("home_assistant");
+    std::cout << "Connected to database" << std::endl;
 
-    driver = sql::mysql::get_mysql_driver_instance();
-    con = driver->connect("tcp://192.168.1.2:3306", db_user, db_password);
-    con->setSchema("home_assistant");
-
-    stmt = con->createStatement();
+/*    stmt = sql_connection->createStatement();
     res = stmt->executeQuery("SELECT * FROM users");
     while(res->next())
     {
       std::cout << "\t... MySQL replies: ";
-      /* Access column data by alias or column name */
+      //Access column data by alias or column name
       std::cout << res->getString("username") << std::endl;
-      /* Access column data by numeric offset, 1 is the first column */
+      //Access column data by numeric offset, 1 is the first column
       std::cout << res->getString(1) << std::endl;
     }
 
-    //ne pozabi dealokacije, nekatere fje niso thread safe
+    delete res;
+    delete stmt;
+*/
+    //nekatere fje niso thread safe !
   }
   catch(sql::SQLException &e)
   {
@@ -128,9 +162,8 @@ int main(int argc, char **argv)
     std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
   }
 
-
   database::RunServer();
-
+  delete sql_connection;
   return 0;
 }
 
