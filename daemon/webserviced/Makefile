@@ -26,8 +26,8 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++` \
 #LDLIBS = -llibgrpc++ -lprotobuf
 
 #file prerequisites for webservice recipe
-#TODO dodas se fajle ki jih zgenerira gSOAP + dodaj da se bo prevedlo s threadi
-FILES = ../../lib/storage.pb.cc ../../lib/storage.grpc.pb.cc ./src/webService.cpp
+FILES = ../../lib/storage.pb.cc ../../lib/storage.grpc.pb.cc ./src/webService.cpp \
+				./src/wsSoapFillResponse.cpp
 
 # -------------------------------------------------------
 

@@ -41,6 +41,30 @@ public:
     return 0;
   }
 
+  int RPC_GetUsers(int session_id, ha__GetUsersResponse &ha__GetUsersResponse_)
+  {
+    databaseRPC::GetUsersRequest request;
+    databaseRPC::GetUsersResponse reply;
+
+    request.set_session_id(session_id);
+    int result = RPC_GetUsers_Execute(request, &reply);
+    if(result != 0)
+    {
+      std::cout << "RPC failed with error code " << result << std::endl;
+      return result;
+    }
+
+    //write results to soap response
+    result = SoapResponse::fillGetUsers(reply, ha__GetUsersResponse_);
+    if(result != 0)
+    {
+      std::cout << "Failed to fill gSOAP response structure with error code " << result << std::endl;
+      return result;
+    }
+
+    return 0;
+  }
+
 private:
   std::unique_ptr<dbRPC::Stub> stub_;
 
@@ -48,6 +72,14 @@ private:
   {
     ClientContext context;
     Status status = stub_->Hello(&context, request, reply);
+    return status.error_code();
+  }
+
+  //TODO make a template function for RPC call -> check if method name to be called can be given as function argument
+  int RPC_GetUsers_Execute(const databaseRPC::GetUsersRequest &request, databaseRPC::GetUsersResponse *reply)
+  {
+    ClientContext context;
+    Status status = stub_->GetUsers(&context, request, reply);
     return status.error_code();
   }
 };
@@ -151,12 +183,73 @@ int HASOAPService::GetDateTime(const std::string& ha__GetDateTimeRequest, std::s
 
   //parse RPC response
 
-  //construct soap response
+  //fill gsoap response
   auto t = std::time(nullptr);
   auto tm = *std::localtime(&t);
   std::ostringstream oss;
   oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
   ha__GetDateTimeResponse.assign(oss.str());
 
-  return 0;
+  return WS_OK;
 }
+
+int HASOAPService::GetUsers(ha__GetUsersRequest *ha__GetUsersRequest_, ha__GetUsersResponse &ha__GetUsersResponse_)
+{
+  int result = 0;
+  std::cout << "GetUsers" << std::endl;
+
+  //get data via RPC and fill gsoap response structure with results
+  result = rpc_client_db.RPC_GetUsers(ha__GetUsersRequest_->session_id, ha__GetUsersResponse_);
+  if(result != 0)
+  {
+    std::cout << "GetUsers RPC error" << std::endl;
+    return WS_ERROR_RPC;
+  }
+
+  return WS_OK;
+}
+
+int HASOAPService::UserLogin(ha__UserLoginRequest *ha__UserLoginRequest_, ha__UserLoginResponse &ha__UserLoginResponse_)
+{
+  std::cout << "UserLogin" << std::endl;
+
+  //TODO read data from soap in a way that prevents sql injection
+
+  return WS_OK;
+}
+
+int HASOAPService::UserLogout(ha__UserLogoutRequest *ha__UserLogoutRequest_, int &ha__UserLogoutResponse)
+{
+  std::cout << "UserLogout" << std::endl;
+
+  return WS_OK;
+}
+
+int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, ha__GetMessagesResponse &ha__GetMessagesResponse_)
+{
+  std::cout << "GetMessages" << std::endl;
+
+  return WS_OK;
+}
+
+int HASOAPService::GetApiData(_ha__GetApiDataRequest *ha__GetApiDataRequest_, _ha__GetApiDataResponse &ha__GetApiDataResponse_)
+{
+  std::cout << "GetApiData" << std::endl;
+
+  return WS_OK;
+}
+
+int HASOAPService::GetApplianceData(ha__GetApplianceDataRequest *ha__GetApplianceDataRequest_, ha__GetApplianceDataResponse &ha__GetApplianceDataResponse_)
+{
+  std::cout << "GetApplianceData" << std::endl;
+
+  return WS_OK;
+}
+
+int HASOAPService::GetAppliances(ha__GetAppliancesRequest *ha__GetAppliancesRequest_, ha__GetAppliancesResponse &ha__GetAppliancesResponse_)
+{
+  std::cout << "GetAppliances" << std::endl;
+
+  return WS_OK;
+}
+

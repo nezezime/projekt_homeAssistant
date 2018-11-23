@@ -36,8 +36,15 @@ constexpr unsigned int soap_max_keep_alive = 100;
 constexpr unsigned int soap_max_req_backlog = 10;
 
 //error codes
+constexpr int WS_OK = 0;
 constexpr int WS_ERROR_GENERAL = -1;
 constexpr int WS_ERROR_RPC = -2;
+constexpr int WS_ERROR_INVALID_PARAMETERS = -3;
+
+namespace SoapResponse
+{
+  int fillGetUsers(const databaseRPC::GetUsersResponse &rpc_response, ha__GetUsersResponse &ha__GetUsersResponse_);
+}
 
 //closes socket automatically on destruction
 class AutoSocket
