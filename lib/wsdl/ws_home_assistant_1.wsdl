@@ -5,6 +5,140 @@
 		<xsi:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema" targetNamespace="http://home-assistant.namespace/ha/" elementFormDefault="qualified">
 			<xsi:element name="GetDateTimeResponse" type="xsi:string"/>
 			<xsi:element name="GetDateTimeRequest" type="xsi:string"/>
+			<xsi:element name="GetUsersRequest" type="ha:GetUsersRequest"/>
+			<xsi:complexType name="GetUsersRequest">
+				<xsi:sequence>
+					<xsi:element name="session-id" type="xsi:int"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetUsersResponse" type="ha:GetUsersResponse"/>
+			<xsi:complexType name="GetUsersResponse">
+				<xsi:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsi:element name="user-name" type="xsi:string"/>
+					<xsi:element name="user-id" type="xsi:int"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="UserLoginRequest" type="ha:UserLoginRequest"/>
+			<xsi:complexType name="UserLoginRequest">
+				<xsi:sequence>
+					<xsi:element name="user-name" type="xsi:string"/>
+					<xsi:element name="password" type="xsi:string"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="UserLoginResponse" type="ha:UserLoginResponse"/>
+			<xsi:complexType name="UserLoginResponse">
+				<xsi:sequence>
+					<xsi:element name="status-code">
+						<xsi:annotation>
+							<xsi:documentation>0 of success error code otherwise</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="session-id" type="xsi:int" minOccurs="0">
+						<xsi:annotation>
+							<xsi:documentation>session id for current login</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="reason" type="xsi:string" minOccurs="0">
+						<xsi:annotation>
+							<xsi:documentation>reason for login failure</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="UserLogoutRequest" type="ha:UserLogoutRequest"/>
+			<xsi:complexType name="UserLogoutRequest">
+				<xsi:sequence>
+					<xsi:element name="session-id" type="xsi:int"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="UserLogoutResponse" type="xsi:int"/>
+			<xsi:element name="GetMessagesRequest" type="ha:GetMessagesRequest"/>
+			<xsi:complexType name="GetMessagesRequest">
+				<xsi:sequence minOccurs="0">
+					<xsi:element name="session-id" type="xsi:int"/>
+					<xsi:element name="user-id" type="xsi:int" minOccurs="0">
+						<xsi:annotation>
+							<xsi:documentation>user id to fetch data for. default: Everyone</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="from-time" type="xsi:dateTime" minOccurs="0"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetMessagesResponse" type="ha:GetMessagesResponse"/>
+			<xsi:complexType name="GetMessagesResponse">
+				<xsi:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsi:element name="message-id" type="xsi:unsignedInt" minOccurs="0"/>
+					<xsi:element name="message-timestamp" type="xsi:dateTime">
+						<xsi:annotation>
+							<xsi:documentation>timestamp of when the message was posted</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="author-id" type="xsi:int">
+						<xsi:annotation>
+							<xsi:documentation>user id of message author</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="author-name" type="xsi:string" minOccurs="0">
+						<xsi:annotation>
+							<xsi:documentation>user name of message author</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
+					<xsi:element name="message-content" type="xsi:string"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetApiDataRequest">
+				<xsi:complexType>
+					<xsi:complexContent>
+						<xsi:extension base="ha:GetApiDataRequest">
+							<xsi:sequence>
+								<xsi:element name="session-id" type="xsi:int"/>
+								<xsi:element name="api-id" type="xsi:int"/>
+							</xsi:sequence>
+						</xsi:extension>
+					</xsi:complexContent>
+				</xsi:complexType>
+			</xsi:element>
+			<xsi:complexType name="GetApiDataRequest"/>
+			<xsi:element name="GetApiDataResponse">
+				<xsi:complexType>
+					<xsi:complexContent>
+						<xsi:extension base="ha:GetApiDataResponse">
+							<xsi:sequence>
+								<xsi:element name="api-id" type="xsi:int"/>
+								<xsi:element name="data" type="xsi:int" minOccurs="0" maxOccurs="unbounded"/>
+							</xsi:sequence>
+						</xsi:extension>
+					</xsi:complexContent>
+				</xsi:complexType>
+			</xsi:element>
+			<xsi:complexType name="GetApiDataResponse"/>
+			<xsi:element name="GetApplianceDataRequest" type="ha:GetApplianceDataRequest"/>
+			<xsi:complexType name="GetApplianceDataRequest">
+				<xsi:sequence minOccurs="0">
+					<xsi:element name="session-id" type="xsi:int"/>
+					<xsi:element name="appliance-id" type="xsi:int"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetApplianceDataResponse" type="ha:GetApplianceDataResponse"/>
+			<xsi:complexType name="GetApplianceDataResponse">
+				<xsi:sequence minOccurs="0">
+					<xsi:element name="appliance-id" type="xsi:int"/>
+					<xsi:element name="data" type="xsi:string" minOccurs="0" maxOccurs="unbounded"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetAppliancesRequest" type="ha:GetAppliancesRequest"/>
+			<xsi:complexType name="GetAppliancesRequest">
+				<xsi:sequence minOccurs="0">
+					<xsi:element name="session-id" type="xsi:int"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="GetAppliancesResponse" type="ha:GetAppliancesResponse"/>
+			<xsi:complexType name="GetAppliancesResponse">
+				<xsi:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsi:element name="appliance-id" type="xsi:int"/>
+					<xsi:element name="appliance-name" type="xsi:string"/>
+				</xsi:sequence>
+			</xsi:complexType>
 		</xsi:schema>
 	</wsdl:types>
 	<wsdl:message name="GetDateTimeRequest">
@@ -13,16 +147,149 @@
 	<wsdl:message name="GetDateTimeResponse">
 		<wsdl:part name="parameter" element="ha:GetDateTimeResponse"/>
 	</wsdl:message>
+	<wsdl:message name="GetUsersRequest">
+		<wsdl:part name="parameter" element="ha:GetUsersRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetUsersResponse">
+		<wsdl:part name="parameter" element="ha:GetUsersResponse"/>
+	</wsdl:message>
+	<wsdl:message name="UserLoginRequest">
+		<wsdl:part name="parameter" element="ha:UserLoginRequest"/>
+	</wsdl:message>
+	<wsdl:message name="UserLoginResponse">
+		<wsdl:part name="parameter" element="ha:UserLoginResponse"/>
+	</wsdl:message>
+	<wsdl:message name="UserLogoutRequest">
+		<wsdl:part name="parameter" element="ha:UserLogoutRequest"/>
+	</wsdl:message>
+	<wsdl:message name="UserLogoutResponse">
+		<wsdl:part name="parameter" element="ha:UserLogoutResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetMessagesRequest">
+		<wsdl:part name="parameter" element="ha:GetMessagesRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetMessagesResponse">
+		<wsdl:part name="parameter" element="ha:GetMessagesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetApiDataRequest">
+		<wsdl:part name="parameter" element="ha:GetApiDataRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetApiDataResponse">
+		<wsdl:part name="parameter" element="ha:GetApiDataResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetApplianceDataRequest">
+		<wsdl:part name="parameter" element="ha:GetApplianceDataRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetApplianceDataResponse">
+		<wsdl:part name="parameter" element="ha:GetApplianceDataResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAppliancesRequest">
+		<wsdl:part name="parameter" element="ha:GetAppliancesRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetAppliancesResponse">
+		<wsdl:part name="parameter" element="ha:GetAppliancesResponse"/>
+	</wsdl:message>
 	<wsdl:portType name="HAPort">
 		<wsdl:operation name="GetDateTime">
 			<wsdl:input message="ha:GetDateTimeRequest"/>
 			<wsdl:output message="ha:GetDateTimeResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetUsers">
+			<wsdl:input message="ha:GetUsersRequest"/>
+			<wsdl:output message="ha:GetUsersResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="UserLogin">
+			<wsdl:input message="ha:UserLoginRequest"/>
+			<wsdl:output message="ha:UserLoginResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="UserLogout">
+			<wsdl:input message="ha:UserLogoutRequest"/>
+			<wsdl:output message="ha:UserLogoutResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetMessages">
+			<wsdl:input message="ha:GetMessagesRequest"/>
+			<wsdl:output message="ha:GetMessagesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetApiData">
+			<wsdl:input message="ha:GetApiDataRequest"/>
+			<wsdl:output message="ha:GetApiDataResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetApplianceData">
+			<wsdl:input message="ha:GetApplianceDataRequest"/>
+			<wsdl:output message="ha:GetApplianceDataResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAppliances">
+			<wsdl:input message="ha:GetAppliancesRequest"/>
+			<wsdl:output message="ha:GetAppliancesResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="HASOAP" type="ha:HAPort">
 		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 		<wsdl:operation name="GetDateTime">
 			<soap12:operation soapAction="http://home-assistant.org/GetDateTime" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetUsers">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="UserLogin">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="UserLogout">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetMessages">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetApiData">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetApplianceData">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAppliances">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
 			<wsdl:input>
 				<soap12:body use="literal"/>
 			</wsdl:input>
