@@ -28,7 +28,7 @@
 			<xsi:element name="UserLoginResponse" type="ha:UserLoginResponse"/>
 			<xsi:complexType name="UserLoginResponse">
 				<xsi:sequence>
-					<xsi:element name="status-code">
+					<xsi:element name="status-code" type="xsi:int">
 						<xsi:annotation>
 							<xsi:documentation>0 of success error code otherwise</xsi:documentation>
 						</xsi:annotation>
