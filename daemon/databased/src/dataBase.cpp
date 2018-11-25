@@ -60,13 +60,13 @@ public:
       AutoSqlStmt auto_sql(sql_connection);
       auto_sql.executeQuery("SELECT * FROM users");
 
-      //TODO parse results from database response and pass them to RPC response
-
       while(auto_sql.result->next())
       {
-        std::cout << "\t. ";
+        ::databaseRPC::GetUsersResponse_UserInfoBlock *user_info_block = response->add_user_info();
+        user_info_block->set_user_name(auto_sql.result->getString("username"));
+        user_info_block->set_user_id(auto_sql.result->getUInt("uid"));
         std::cout << auto_sql.result->getString("username") << std::endl;
-        std::cout << auto_sql.result->getString(1) << std::endl;
+        std::cout << auto_sql.result->getUInt("uid") << std::endl;
       }
     }
     catch(sql::SQLException &e)
@@ -77,6 +77,79 @@ public:
 
     return Status::OK;
   }
+
+  //RPC UserLogin
+  Status UserLogin(::grpc::ServerContext* context,
+                    const ::databaseRPC::UserLoginRequest* request,
+                    ::databaseRPC::UserLoginResponse* response) override
+  {
+    if(!request->has_user_name() || !request->has_password())
+    {
+      std::cout << "UserLogin RPC request missing user_name or password" << std::endl;
+      return Status(grpc::StatusCode::FAILED_PRECONDITION, "missing user_name or password");
+    }
+
+    try
+    {
+      AutoSqlStmt auto_sql(sql_connection);
+      std::string sql_query = "SELECT COUNT(*) FROM users WHERE username = '" + request->user_name() +
+                              "' AND password ='" + request->password() + "'";
+      auto_sql.executeQuery(sql_query);
+
+      // check if only a single entry matches user name and password
+      if(auto_sql.result->next())
+      {
+        if(auto_sql.result->getUInt("COUNT(*)") == 1)
+        {
+          std::cout << "Login success" << std::endl;
+          response->set_status_code(0);
+
+          //get next session id from database
+          sql_query = "SELECT MAX(session_id) FROM users";
+          auto_sql.executeQuery(sql_query);
+          if(auto_sql.result->next())
+          {
+            int session_id = auto_sql.result->getUInt("MAX(session_id)") + 1;
+            response->set_session_id(session_id);
+
+            //store assigned sesion id
+            sql_query = "UPDATE users SET session_id = " + std::to_string(session_id) +
+                        " WHERE username = '" + request->user_name() + "'";
+            std::cout << sql_query << std::endl;
+            std::cout << "assigned session id " << session_id << " to user "
+                      << request->user_name() << std::endl;
+
+            //TODO this raises an exception even though the statement is fine and
+            //does what it was supposed to
+            auto_sql.executeQuery(sql_query);
+          }
+        }
+        else
+        {
+          std::cout << "Login failed: invalid username or password" << std::endl;
+          response->set_status_code(-1);
+          response->set_reason("invalid username or password");
+          return Status::OK;
+        }
+      }
+    }
+    catch(sql::SQLException &e)
+    {
+      int error_code = e.getErrorCode();
+      if(error_code == 0)
+      {
+        std::cout << "exception raised with status code 0" << std::endl;
+        return Status::OK;
+      }
+
+      std::cout << "MySQL error code: " << error_code << std::endl;
+      return Status(grpc::StatusCode::INTERNAL, "database access error");
+    }
+
+
+    return Status::OK;
+  }
+
 };
 
 int main(int argc, char **argv)

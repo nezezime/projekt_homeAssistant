@@ -73,7 +73,7 @@ class AutoSqlStmt
 
   ~AutoSqlStmt()
   {
-    std::cout << "Sql statement and result deleted" << std::endl;
+    //std::cout << "Sql statement and result deleted" << std::endl;
     delete stmt;
     delete result;
   };

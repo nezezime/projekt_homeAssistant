@@ -43,7 +43,13 @@ constexpr int WS_ERROR_INVALID_PARAMETERS = -3;
 
 namespace SoapResponse
 {
-  int fillGetUsers(const databaseRPC::GetUsersResponse &rpc_response, ha__GetUsersResponse &ha__GetUsersResponse_);
+  int fillGetUsers(struct soap *soap,
+                  const databaseRPC::GetUsersResponse &rpc_response,
+                  ha__GetUsersResponse &gsoap_response);
+
+  int fillUserResponse(struct soap *soap,
+                      const databaseRPC::UserLoginResponse &rpc_response,
+                      ha__UserLoginResponse &gsoap_response);
 }
 
 //closes socket automatically on destruction

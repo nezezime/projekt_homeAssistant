@@ -26,10 +26,11 @@ public:
 
     //populate request
     request.set_name("test");
-    request.set_message_id(1234);
+    request.set_message_id(0);
 
     //send RPC
-    int result = RPC_Hello_Execute(request, &reply);
+    //int result = RPC_Hello_Execute(request, &reply);
+    int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::Hello);
     if(result != 0)
     {
       std::cout << "RPC failed with error code " << result << std::endl;
@@ -41,13 +42,13 @@ public:
     return 0;
   }
 
-  int RPC_GetUsers(int session_id, ha__GetUsersResponse &ha__GetUsersResponse_)
+  int RPC_GetUsers(struct soap *soap, int session_id, ha__GetUsersResponse &gsoap_response)
   {
     databaseRPC::GetUsersRequest request;
     databaseRPC::GetUsersResponse reply;
 
     request.set_session_id(session_id);
-    int result = RPC_GetUsers_Execute(request, &reply);
+    int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::GetUsers);
     if(result != 0)
     {
       std::cout << "RPC failed with error code " << result << std::endl;
@@ -55,7 +56,35 @@ public:
     }
 
     //write results to soap response
-    result = SoapResponse::fillGetUsers(reply, ha__GetUsersResponse_);
+    result = SoapResponse::fillGetUsers(soap, reply, gsoap_response);
+    if(result != 0)
+    {
+      std::cout << "Failed to fill gSOAP response structure with error code " << result << std::endl;
+      return result;
+    }
+
+    return 0;
+  }
+
+  int RPC_UserLogin(struct soap *soap,
+                  std::string user_name,
+                  std::string password,
+                  ha__UserLoginResponse &gsoap_response)
+  {
+    databaseRPC::UserLoginRequest request;
+    databaseRPC::UserLoginResponse reply;
+
+    request.set_user_name(user_name);
+    request.set_password(password);
+    int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::UserLogin);
+    if(result != 0)
+    {
+      std::cout << "RPC failed with error code " << result << std::endl;
+      return result;
+    }
+
+    //write results to soap response
+    result = SoapResponse::fillUserResponse(soap, reply, gsoap_response);
     if(result != 0)
     {
       std::cout << "Failed to fill gSOAP response structure with error code " << result << std::endl;
@@ -67,19 +96,21 @@ public:
 
 private:
   std::unique_ptr<dbRPC::Stub> stub_;
-
+/*
   int RPC_Hello_Execute(const databaseRPC::HelloRequest &request, databaseRPC::HelloReply *reply)
   {
     ClientContext context;
     Status status = stub_->Hello(&context, request, reply);
     return status.error_code();
   }
+*/
 
-  //TODO make a template function for RPC call -> check if method name to be called can be given as function argument
-  int RPC_GetUsers_Execute(const databaseRPC::GetUsersRequest &request, databaseRPC::GetUsersResponse *reply)
+  template <typename RpcRequest, typename RpcResponse>
+  int RPC_Request_Execute(const RpcRequest &request, RpcResponse *reply,
+                         grpc::Status (dbRPC::Stub::*method)(ClientContext *, const RpcRequest &, RpcResponse *))
   {
     ClientContext context;
-    Status status = stub_->GetUsers(&context, request, reply);
+    Status status = (*stub_.*method)(&context, request, reply);
     return status.error_code();
   }
 };
@@ -112,7 +143,7 @@ int main(int argc, char **argv)
 
   //SOAP multithreaded server initialization
   struct soap soap;
-  struct soap * soap_safe_copy;
+  struct soap *soap_safe_copy;
   SOAP_SOCKET soap_socket, s;
   soap_init(&soap);
   //soap_imode(&soap, SOAP_XML_STRICT);
@@ -199,7 +230,7 @@ int HASOAPService::GetUsers(ha__GetUsersRequest *ha__GetUsersRequest_, ha__GetUs
   std::cout << "GetUsers" << std::endl;
 
   //get data via RPC and fill gsoap response structure with results
-  result = rpc_client_db.RPC_GetUsers(ha__GetUsersRequest_->session_id, ha__GetUsersResponse_);
+  result = rpc_client_db.RPC_GetUsers(soap, ha__GetUsersRequest_->session_id, ha__GetUsersResponse_);
   if(result != 0)
   {
     std::cout << "GetUsers RPC error" << std::endl;
@@ -211,9 +242,21 @@ int HASOAPService::GetUsers(ha__GetUsersRequest *ha__GetUsersRequest_, ha__GetUs
 
 int HASOAPService::UserLogin(ha__UserLoginRequest *ha__UserLoginRequest_, ha__UserLoginResponse &ha__UserLoginResponse_)
 {
+  int result = 0;
   std::cout << "UserLogin" << std::endl;
 
+  result = rpc_client_db.RPC_UserLogin(soap,
+                                      ha__UserLoginRequest_->user_name,
+                                      ha__UserLoginRequest_->password,
+                                      ha__UserLoginResponse_);
+  if(result != 0)
+  {
+    std::cout << "GetUsers RPC error" << std::endl;
+    return WS_ERROR_RPC;
+  }
+
   //TODO read data from soap in a way that prevents sql injection
+
 
   return WS_OK;
 }
