@@ -29,7 +29,29 @@ int SoapResponse::fillUserResponse(struct soap *soap,
                                   const databaseRPC::UserLoginResponse &rpc_response,
                                   ha__UserLoginResponse &gsoap_response)
 {
-  std::cout << "fillUserResponse" << std::endl;
+  gsoap_response.status_code = rpc_response.status_code();
+  if(rpc_response.status_code() == 0)
+  {
+    if(rpc_response.has_session_id())
+    {
+      std::cout << "fillUserResponse login successful" << std::endl;
+      int *session_id = static_cast<int *> (soap_malloc(soap, sizeof(int)));
+      *session_id = rpc_response.session_id();
+      gsoap_response.session_id = session_id;
+
+      //TODO register a new active session with session manager
+    }
+  }
+  else
+  {
+    std::cout << "fillUserResponse login failed" << std::endl;
+    if(rpc_response.has_reason())
+    {
+      std::string *reason = soap_new_std__string(soap);
+      *reason = rpc_response.reason();
+      gsoap_response.reason = reason;
+    }
+  }
 
   return WS_OK;
 }

@@ -6,6 +6,8 @@
 #include <ctime>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
+#include <map>
 #include <memory>
 #include <pthread.h>
 #include <random>
@@ -51,6 +53,61 @@ namespace SoapResponse
                       const databaseRPC::UserLoginResponse &rpc_response,
                       ha__UserLoginResponse &gsoap_response);
 }
+
+//represents an active session
+class SessionContainer
+{
+  public:
+  int session_id;
+  unsigned int timeout;
+};
+
+class SessionManager
+{
+  private:
+  std::map<int, SessionContainer> active_sessions;
+
+  public:
+  //find session by key
+  int searchSession(int key)
+  {
+    if(active_sessions.find(key) == active_sessions.end())
+    {
+      std::cout << "SessionManager session not found" << std::endl;
+      return -1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  //add a new session
+  int addSession(SessionContainer session)
+  {
+    if(active_sessions.insert(std::pair<int, SessionContainer> (session.session_id, session)).second == false)
+    {
+      std::cout << "SessionManager failed to insert sesion" << std::endl;
+      return -1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  //check for timeouts
+  //TODO use std::this_thread::sleep_until for periodic execution in separate thread
+  int timeouts()
+  {
+    return 0;
+  }
+
+  int size()
+  {
+    return active_sessions.size();
+  }
+};
 
 //closes socket automatically on destruction
 class AutoSocket
