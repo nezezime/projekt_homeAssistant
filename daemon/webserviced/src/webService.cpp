@@ -9,6 +9,9 @@ using grpc::ClientWriter;
 using grpc::Status;
 using databaseRPC::dbRPC;
 
+// global variables
+SessionManager session_manager;
+
 /************************************** CLASS DEFINITIONS *****************************************/
 class ClientDbRPC
 {
@@ -263,7 +266,15 @@ int HASOAPService::UserLogin(ha__UserLoginRequest *ha__UserLoginRequest_, ha__Us
 
 int HASOAPService::UserLogout(ha__UserLogoutRequest *ha__UserLogoutRequest_, int &ha__UserLogoutResponse)
 {
+  int result = 0;
   std::cout << "UserLogout" << std::endl;
+
+  result = session_manager.terminateSession(ha__UserLogoutRequest_->session_id);
+  if(result != 0)
+  {
+    std::cout << "UserLogout error" << std::endl;
+    return soap_receiver_fault(soap, WS_ERROR_GENERAL_TEXT, "UserLogout error");
+  }
 
   return WS_OK;
 }

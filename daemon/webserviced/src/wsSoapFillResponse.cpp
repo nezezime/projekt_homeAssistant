@@ -39,7 +39,10 @@ int SoapResponse::fillUserResponse(struct soap *soap,
       *session_id = rpc_response.session_id();
       gsoap_response.session_id = session_id;
 
-      //TODO register a new active session with session manager
+      //register a new active session with session manager
+      SessionContainer container(*session_id, DEFAULT_SESSION_TIMEOUT);
+      session_manager.addSession(container);
+      session_manager.searchSession(*session_id);
     }
   }
   else

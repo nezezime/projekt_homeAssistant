@@ -43,6 +43,11 @@ constexpr int WS_ERROR_GENERAL = -1;
 constexpr int WS_ERROR_RPC = -2;
 constexpr int WS_ERROR_INVALID_PARAMETERS = -3;
 
+constexpr char WS_ERROR_GENERAL_TEXT[] = "WS_ERROR_GENERAL";
+
+//other constants
+constexpr unsigned int DEFAULT_SESSION_TIMEOUT = 100000;
+
 namespace SoapResponse
 {
   int fillGetUsers(struct soap *soap,
@@ -60,6 +65,12 @@ class SessionContainer
   public:
   int session_id;
   unsigned int timeout;
+
+  SessionContainer(int id, unsigned int timeout)
+  {
+    this->session_id = id;
+    this->timeout = timeout;
+  }
 };
 
 class SessionManager
@@ -78,6 +89,7 @@ class SessionManager
     }
     else
     {
+      std::cout << "SessionManager session found" << std::endl;
       return 0;
     }
   }
@@ -96,6 +108,21 @@ class SessionManager
     }
   }
 
+  //terminate session (log out)
+  int terminateSession(int key)
+  {
+    if(active_sessions.erase(key) == 1)
+    {
+      std::cout << "SessionManager session " << std::to_string(key) << " terminated" << std::endl;
+      return 0;
+    }
+    else
+    {
+      std::cout << "SessionManager terminate session error" << std::endl;
+      return -1;
+    }
+  }
+
   //check for timeouts
   //TODO use std::this_thread::sleep_until for periodic execution in separate thread
   int timeouts()
@@ -108,6 +135,8 @@ class SessionManager
     return active_sessions.size();
   }
 };
+
+extern SessionManager session_manager;
 
 //closes socket automatically on destruction
 class AutoSocket
