@@ -42,7 +42,7 @@ public:
 
     //parse response
     std::cout << "RPC response OK for message_id " << reply.message_id() << std::endl;
-    return 0;
+    return WS_OK;
   }
 
   int RPC_GetUsers(struct soap *soap, int session_id, ha__GetUsersResponse &gsoap_response)
@@ -66,7 +66,7 @@ public:
       return result;
     }
 
-    return 0;
+    return WS_OK;
   }
 
   int RPC_UserLogin(struct soap *soap,
@@ -94,7 +94,39 @@ public:
       return result;
     }
 
-    return 0;
+    return WS_OK;
+  }
+
+  int RPC_GetMessages(struct soap *soap,
+                    int user_id,
+                    time_t *from_time,
+                    ha__GetMessagesResponse &gsoap_response)
+  {
+    databaseRPC::GetMessagesRequest request;
+    databaseRPC::GetMessagesResponse reply;
+
+    request.set_user_id(user_id);
+    if(from_time != nullptr)
+    {
+      request.set_from_time(*from_time);
+    }
+
+    int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::GetMessages);
+    if(result != 0)
+    {
+      std::cout << "RPC failed with error code " << result << std::endl;
+      return result;
+    }
+
+    //write results to soap response
+    result = SoapResponse::fillGetMessagesResponse(soap, reply, gsoap_response);
+    if(result != 0)
+    {
+      std::cout << "Failed to fill gSOAP response structure with error code " << result << std::endl;
+      return result;
+    }
+
+    return WS_OK;
   }
 
 private:
@@ -281,7 +313,25 @@ int HASOAPService::UserLogout(ha__UserLogoutRequest *ha__UserLogoutRequest_, int
 
 int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, ha__GetMessagesResponse &ha__GetMessagesResponse_)
 {
+  int result = 0;
   std::cout << "GetMessages" << std::endl;
+
+  result = session_manager.authCheck(ha__GetMessagesRequest_->__GetMessagesRequest_sequence->session_id);
+  if(result != WS_OK)
+  {
+    std::cout << "GetMessages authentication error" << std::endl;
+    return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "GetMessages authentication error");
+  }
+
+  result = rpc_client_db.RPC_GetMessages(soap,
+                                        *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->user_id,
+                                        ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time,
+                                        ha__GetMessagesResponse_);
+  if(result != 0)
+  {
+    std::cout << "GetMessages RPC error" << std::endl;
+    return WS_ERROR_RPC;
+  }
 
   return WS_OK;
 }
@@ -306,4 +356,3 @@ int HASOAPService::GetAppliances(ha__GetAppliancesRequest *ha__GetAppliancesRequ
 
   return WS_OK;
 }
-

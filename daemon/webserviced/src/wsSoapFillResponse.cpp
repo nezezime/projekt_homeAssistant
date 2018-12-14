@@ -58,3 +58,38 @@ int SoapResponse::fillUserResponse(struct soap *soap,
 
   return WS_OK;
 }
+
+int SoapResponse::fillGetMessagesResponse(struct soap *soap,
+                                        const databaseRPC::GetMessagesResponse &rpc_response,
+                                        ha__GetMessagesResponse &gsoap_response)
+{
+  int message_response_size = rpc_response.message_size();
+  std::cout << "fillGetMessages rpc response size " << message_response_size << std::endl;
+
+  for(int i=0; i<message_response_size; i++)
+  {
+    databaseRPC::GetMessagesResponse_MessageBlock rpc_message = rpc_response.message(i);
+    __ha__GetMessagesResponse_sequence *message = soap_new___ha__GetMessagesResponse_sequence(soap);
+
+    unsigned int *message_id = static_cast<unsigned int *> (soap_malloc(soap, sizeof(unsigned int)));
+    *message_id = rpc_message.message_id();
+    message->message_id = message_id;
+
+    std::string *message_content = soap_new_std__string(soap);
+    *message_content = rpc_message.message_content();
+    message->message_content = *message_content;
+
+    if(rpc_message.has_author_name())
+    {
+      std::string *author_name = soap_new_std__string(soap);
+      *author_name = rpc_message.author_name();
+      message->author_name = author_name;
+    }
+
+    message->message_timestamp = static_cast<time_t> (rpc_message.message_timestamp());
+    message->author_id = rpc_message.author_id();
+    gsoap_response.__GetMessagesResponse_sequence.push_back(*message);
+  }
+
+  return WS_OK;
+}

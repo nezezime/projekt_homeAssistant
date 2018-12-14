@@ -42,8 +42,10 @@ constexpr int WS_OK = 0;
 constexpr int WS_ERROR_GENERAL = -1;
 constexpr int WS_ERROR_RPC = -2;
 constexpr int WS_ERROR_INVALID_PARAMETERS = -3;
+constexpr int WS_ERROR_AUTHENTICATION = -4;
 
 constexpr char WS_ERROR_GENERAL_TEXT[] = "WS_ERROR_GENERAL";
+constexpr char WS_ERROR_AUTHENTICATION_TEXT[] = "WS_ERROR_AUTHENTICATION";
 
 //other constants
 constexpr unsigned int DEFAULT_SESSION_TIMEOUT = 100000;
@@ -57,6 +59,10 @@ namespace SoapResponse
   int fillUserResponse(struct soap *soap,
                       const databaseRPC::UserLoginResponse &rpc_response,
                       ha__UserLoginResponse &gsoap_response);
+
+  int fillGetMessagesResponse(struct soap *soap,
+                              const databaseRPC::GetMessagesResponse &rpc_response,
+                              ha__GetMessagesResponse &gsoap_response);
 }
 
 //represents an active session
@@ -90,7 +96,7 @@ class SessionManager
     else
     {
       std::cout << "SessionManager session found" << std::endl;
-      return 0;
+      return WS_OK;
     }
   }
 
@@ -104,7 +110,7 @@ class SessionManager
     }
     else
     {
-      return 0;
+      return WS_OK;
     }
   }
 
@@ -114,7 +120,7 @@ class SessionManager
     if(active_sessions.erase(key) == 1)
     {
       std::cout << "SessionManager session " << std::to_string(key) << " terminated" << std::endl;
-      return 0;
+      return WS_OK;
     }
     else
     {
@@ -123,11 +129,23 @@ class SessionManager
     }
   }
 
+  //check if session is active and user authorized
+  int authCheck(int key)
+  {
+    if(searchSession(key) != WS_OK)
+    {
+      std::cout << "SessionManager terminate session error" << std::endl;
+      return WS_ERROR_AUTHENTICATION;
+    }
+
+    return WS_OK;
+  }
+
   //check for timeouts
   //TODO use std::this_thread::sleep_until for periodic execution in separate thread
   int timeouts()
   {
-    return 0;
+    return WS_OK;
   }
 
   int size()
