@@ -146,6 +146,41 @@ public:
       return Status(grpc::StatusCode::INTERNAL, "database access error");
     }
 
+    return Status::OK;
+  }
+
+  //RPC GetMessages
+  Status GetMessages(::grpc::ServerContext* context,
+                    const ::databaseRPC::GetMessagesRequest* request,
+                    ::databaseRPC::GetMessagesResponse* response) override
+  {
+    if(request->has_from_time())
+    {
+      time_t from_time = static_cast<time_t> (request->from_time());
+      std::cout << "GetMessages " << std::to_string(from_time) << std::endl;
+    }
+
+    try
+    {
+      AutoSqlStmt auto_sql(sql_connection);
+      std::string sql_query = "";
+
+      //TODO read database
+
+      auto_sql.executeQuery(sql_query);
+    }
+    catch(sql::SQLException &e)
+    {
+      int error_code = e.getErrorCode();
+      if(error_code == 0)
+      {
+        std::cout << "exception raised with status code 0" << std::endl;
+        return Status::OK;
+      }
+
+      std::cout << "MySQL error code: " << error_code << std::endl;
+      return Status(grpc::StatusCode::INTERNAL, "database access error");
+    }
 
     return Status::OK;
   }
