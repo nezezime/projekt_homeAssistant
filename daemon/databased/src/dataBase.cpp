@@ -154,20 +154,50 @@ public:
                     const ::databaseRPC::GetMessagesRequest* request,
                     ::databaseRPC::GetMessagesResponse* response) override
   {
+    std::string sql_query = "SELECT messages.author_id, messages.message_id, "
+                        "messages.timestamp, messages_content.content, users.username FROM messages "
+                        "INNER JOIN messages_content ON messages.message_content_id = messages_content.content_id "
+                        "INNER JOIN users ON messages.author_id = users.uid ";
+
     if(request->has_from_time())
     {
       time_t from_time = static_cast<time_t> (request->from_time());
       std::cout << "GetMessages " << std::to_string(from_time) << std::endl;
+      sql_query += " WHERE messages.timestamp > FROM_UNIXTIME(";
+      sql_query += std::to_string(from_time);
+      sql_query += ")";
     }
 
     try
     {
       AutoSqlStmt auto_sql(sql_connection);
-      std::string sql_query = "";
 
-      //TODO read database
-
+      std::cout << "query: " << sql_query << std::endl;
       auto_sql.executeQuery(sql_query);
+
+      //parse response
+      while(auto_sql.result->next())
+      {
+        databaseRPC::GetMessagesResponse_MessageBlock *message = response->add_message();
+        message->set_author_name(auto_sql.result->getString("username"));
+        message->set_message_content(auto_sql.result->getString("content"));
+        message->set_message_id(auto_sql.result->getUInt("message_id"));
+        message->set_author_id(auto_sql.result->getUInt("author_id"));
+
+        //convert message timestamp to unix timestamp
+        std::istringstream ss (auto_sql.result->getString("timestamp"));
+        std::tm time_struct;
+        ss >> std::get_time(&time_struct, "%Y-%m-%d %H:%M:%S");
+        time_t message_unix_timestamp = mktime(&time_struct);
+        message->set_message_timestamp(static_cast<unsigned int> (message_unix_timestamp));
+
+        //std::cout << auto_sql.result->getString("content") << std::endl;
+        //std::cout << auto_sql.result->getUInt("message_id") << std::endl;
+        //std::cout << auto_sql.result->getUInt("author_id") << std::endl;
+        //std::cout << auto_sql.result->getString("username") << std::endl;
+        //std::cout << auto_sql.result->getString("timestamp") << std::endl;
+        //std::cout << message_unix_timestamp << std::endl;
+      }
     }
     catch(sql::SQLException &e)
     {
