@@ -134,7 +134,6 @@ class SessionManager
   {
     if(searchSession(key) != WS_OK)
     {
-      std::cout << "SessionManager terminate session error" << std::endl;
       return WS_ERROR_AUTHENTICATION;
     }
 
