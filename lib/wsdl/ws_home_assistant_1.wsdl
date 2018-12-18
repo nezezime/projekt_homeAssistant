@@ -43,6 +43,11 @@
 							<xsi:documentation>reason for login failure</xsi:documentation>
 						</xsi:annotation>
 					</xsi:element>
+					<xsi:element name="user-id" type="xsi:int" minOccurs="0">
+						<xsi:annotation>
+							<xsi:documentation>id of the logged in user</xsi:documentation>
+						</xsi:annotation>
+					</xsi:element>
 				</xsi:sequence>
 			</xsi:complexType>
 			<xsi:element name="UserLogoutRequest" type="ha:UserLogoutRequest"/>
