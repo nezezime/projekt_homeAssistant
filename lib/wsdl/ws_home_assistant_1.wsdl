@@ -146,9 +146,17 @@
 				</xsi:sequence>
 			</xsi:complexType>
 			<xsi:element name="PostMessageRequest" type="ha:PostMessageRequest"/>
-			<xsi:complexType name="PostMessageRequest"/>
-			<xsi:element name="PostMessageResponse" type="ha:PostMessageResponse"/>
-			<xsi:complexType name="PostMessageResponse"/>
+			<xsi:complexType name="PostMessageRequest">
+				<xsi:sequence>
+					<xsi:element name="session-id" type="xsi:int"/>
+					<xsi:element name="author-id" type="xsi:int"/>
+					<xsi:element name="author-name" type="xsi:string" minOccurs="0"/>
+					<xsi:element name="dst-id" type="xsi:int" minOccurs="0"/>
+					<xsi:element name="dst-name" type="xsi:string" minOccurs="0"/>
+					<xsi:element name="content" type="xsi:string"/>
+				</xsi:sequence>
+			</xsi:complexType>
+			<xsi:element name="PostMessageResponse" type="xsi:int"/>
 		</xsi:schema>
 	</wsdl:types>
 	<wsdl:message name="GetDateTimeRequest">
