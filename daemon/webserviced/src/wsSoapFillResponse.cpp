@@ -66,10 +66,11 @@ int SoapResponse::fillGetMessagesResponse(struct soap *soap,
   int message_response_size = rpc_response.message_size();
   std::cout << "fillGetMessages rpc response size " << message_response_size << std::endl;
 
+  __ha__GetMessagesResponse_sequence *messages_sequence = soap_new___ha__GetMessagesResponse_sequence(soap);
   for(int i=0; i<message_response_size; i++)
   {
     databaseRPC::GetMessagesResponse_MessageBlock rpc_message = rpc_response.message(i);
-    __ha__GetMessagesResponse_sequence *message = soap_new___ha__GetMessagesResponse_sequence(soap);
+    _ha__GetMessagesResponse_message *message = soap_new__ha__GetMessagesResponse_message(soap);
 
     unsigned int *message_id = static_cast<unsigned int *> (soap_malloc(soap, sizeof(unsigned int)));
     *message_id = rpc_message.message_id();
@@ -88,8 +89,9 @@ int SoapResponse::fillGetMessagesResponse(struct soap *soap,
 
     message->message_timestamp = static_cast<time_t> (rpc_message.message_timestamp());
     message->author_id = rpc_message.author_id();
-    gsoap_response.__GetMessagesResponse_sequence.push_back(*message);
+    messages_sequence->message.push_back(*message);
   }
 
+  gsoap_response.__GetMessagesResponse_sequence = messages_sequence;
   return WS_OK;
 }

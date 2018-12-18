@@ -98,9 +98,9 @@ public:
   }
 
   int RPC_GetMessages(struct soap *soap,
-                    int user_id,
-                    time_t *from_time,
-                    ha__GetMessagesResponse &gsoap_response)
+                      int user_id,
+                      time_t *from_time,
+                      ha__GetMessagesResponse &gsoap_response)
   {
     databaseRPC::GetMessagesRequest request;
     databaseRPC::GetMessagesResponse reply;
@@ -126,6 +126,22 @@ public:
       return result;
     }
 
+    return WS_OK;
+  }
+
+  int RPC_PostMessage(struct soap *soap,
+                      databaseRPC::PostMessageRequest request,
+                      int &gsoap_response)
+  {
+    databaseRPC::PostMessageResponse reply;
+    int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::PostMessage);
+    if(result != 0)
+    {
+      std::cout << "RPC failed with error code " << result << std::endl;
+      return result;
+    }
+
+    gsoap_response = reply.result();
     return WS_OK;
   }
 
@@ -323,6 +339,8 @@ int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, 
     return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "GetMessages authentication error");
   }
 
+  //TODO get user_id from session manager if missing from request
+
   result = rpc_client_db.RPC_GetMessages(soap,
                                         *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->user_id,
                                         ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time,
@@ -330,6 +348,49 @@ int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, 
   if(result != 0)
   {
     std::cout << "GetMessages RPC error" << std::endl;
+    return WS_ERROR_RPC;
+  }
+
+  return WS_OK;
+}
+
+int HASOAPService::PostMessage(ha__PostMessageRequest *ha__PostMessageRequest_, int &ha__PostMessageResponse)
+{
+  int result = 0;
+  std::cout << "PostMessage" << std::endl;
+
+  //check authorization
+  result = session_manager.authCheck(ha__PostMessageRequest_->session_id);
+  if(result != WS_OK)
+  {
+    std::cout << "PostMessage authentication error" << std::endl;
+    return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "PostMessage authentication error");
+  }
+
+  //fill proto request parameters
+  databaseRPC::PostMessageRequest proto_request;
+  proto_request.set_session_id(ha__PostMessageRequest_->session_id);
+  proto_request.set_author_id(ha__PostMessageRequest_->author_id);
+  proto_request.set_message_content(ha__PostMessageRequest_->content);
+
+  //optional parameters
+  if(ha__PostMessageRequest_->author_name != nullptr)
+  {
+    proto_request.set_author_name(*ha__PostMessageRequest_->author_name);
+  }
+  if(ha__PostMessageRequest_->dst_id != nullptr)
+  {
+    proto_request.set_destination_id(*ha__PostMessageRequest_->dst_id);
+  }
+  if(ha__PostMessageRequest_->dst_name != nullptr)
+  {
+    proto_request.set_destination_name(*ha__PostMessageRequest_->dst_name);
+  }
+
+  result = rpc_client_db.RPC_PostMessage(soap, proto_request, ha__PostMessageResponse);
+  if(result != 0)
+  {
+    std::cout << "PostMessage RPC error" << std::endl;
     return WS_ERROR_RPC;
   }
 
