@@ -215,6 +215,46 @@ public:
     return Status::OK;
   }
 
+  //RPC PostMessage
+  Status PostMessage(::grpc::ServerContext* context,
+                    const ::databaseRPC::PostMessageRequest* request,
+                    ::databaseRPC::PostMessageResponse* response) override
+  {
+    //set query values
+
+    std::string sql_query_message_content = "INSERT INTO messages_content (content_id, content) VALUES (NULL, '";
+    sql_query_message_content += request->message_content();
+    sql_query_message_content += "')";
+
+    //get foregin key for messages table
+    //SELECT * FROM messages_content WHERE content = 'La'  ORDER BY content_id DESC LIMIT 1;
+    std::string sql_query_message_content_id = "SELECT ";
+
+    std::string sql_query_message = "INSERT INTO ";
+    try
+    {
+      std::auto_ptr<sql::Statement> stmt(sql_connection->createStatement());
+      stmt->execute(sql_query_message_content);
+
+
+    }
+    catch(sql::SQLException &e)
+    {
+      int error_code = e.getErrorCode();
+      response->set_result(error_code);
+      if(error_code == 0)
+      {
+        std::cout << "exception raised with status code 0" << std::endl;
+        return Status::OK;
+      }
+
+      std::cout << "MySQL error code: " << error_code << std::endl;
+      return Status(grpc::StatusCode::INTERNAL, "database access error");
+    }
+
+    response->set_result(0);
+    return Status::OK;
+  }
 };
 
 int main(int argc, char **argv)
@@ -275,6 +315,8 @@ int main(int argc, char **argv)
     sql_connection->setSchema("home_assistant");
     std::cout << "Connected to database" << std::endl;
 
+
+
 /*    stmt = sql_connection->createStatement();
     res = stmt->executeQuery("SELECT * FROM users");
     while(res->next())
@@ -312,7 +354,6 @@ void database::RunServer(void)
   std::cout << "Starting databased RPC server" << std::endl;
 
   //instantaniation of RPC service implementation class
-  //TODO v njihovem primeru so parsali se nek db file -> preveri, ce pride v postev zate
   dbRPCImpl service;
 
   grpc::ServerBuilder builder;

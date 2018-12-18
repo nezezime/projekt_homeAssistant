@@ -67,6 +67,11 @@ class AutoSqlStmt
     result = stmt->executeQuery(query);
   }
 
+  sql::ResultSet *getResultSet()
+  {
+    return result;
+  }
+
   AutoSqlStmt(sql::Connection *sql_connection)
   {
     stmt = sql_connection->createStatement();
