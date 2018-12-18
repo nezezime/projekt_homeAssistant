@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2019 (x64) (http://www.altova.com) by k (k) -->
+<!-- edited with XMLSpy v2019 sp1 (x64) (http://www.altova.com) by burak (s) -->
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ha="http://home-assistant.namespace/ha/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://home-assistant.namespace/ha/">
 	<wsdl:types>
 		<xsi:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema" targetNamespace="http://home-assistant.namespace/ha/" elementFormDefault="qualified">
@@ -66,24 +66,30 @@
 			</xsi:complexType>
 			<xsi:element name="GetMessagesResponse" type="ha:GetMessagesResponse"/>
 			<xsi:complexType name="GetMessagesResponse">
-				<xsi:sequence minOccurs="0" maxOccurs="unbounded">
-					<xsi:element name="message-id" type="xsi:unsignedInt" minOccurs="0"/>
-					<xsi:element name="message-timestamp" type="xsi:dateTime">
-						<xsi:annotation>
-							<xsi:documentation>timestamp of when the message was posted</xsi:documentation>
-						</xsi:annotation>
+				<xsi:sequence minOccurs="0">
+					<xsi:element name="message" minOccurs="0" maxOccurs="unbounded">
+						<xsi:complexType>
+							<xsi:sequence>
+								<xsi:element name="message-id" type="xsi:unsignedInt" minOccurs="0"/>
+								<xsi:element name="message-timestamp" type="xsi:dateTime">
+									<xsi:annotation>
+										<xsi:documentation>timestamp of when the message was posted</xsi:documentation>
+									</xsi:annotation>
+								</xsi:element>
+								<xsi:element name="author-id" type="xsi:int">
+									<xsi:annotation>
+										<xsi:documentation>user id of message author</xsi:documentation>
+									</xsi:annotation>
+								</xsi:element>
+								<xsi:element name="author-name" type="xsi:string" minOccurs="0">
+									<xsi:annotation>
+										<xsi:documentation>user name of message author</xsi:documentation>
+									</xsi:annotation>
+								</xsi:element>
+								<xsi:element name="message-content" type="xsi:string"/>
+							</xsi:sequence>
+						</xsi:complexType>
 					</xsi:element>
-					<xsi:element name="author-id" type="xsi:int">
-						<xsi:annotation>
-							<xsi:documentation>user id of message author</xsi:documentation>
-						</xsi:annotation>
-					</xsi:element>
-					<xsi:element name="author-name" type="xsi:string" minOccurs="0">
-						<xsi:annotation>
-							<xsi:documentation>user name of message author</xsi:documentation>
-						</xsi:annotation>
-					</xsi:element>
-					<xsi:element name="message-content" type="xsi:string"/>
 				</xsi:sequence>
 			</xsi:complexType>
 			<xsi:element name="GetApiDataRequest">
@@ -139,6 +145,10 @@
 					<xsi:element name="appliance-name" type="xsi:string"/>
 				</xsi:sequence>
 			</xsi:complexType>
+			<xsi:element name="PostMessageRequest" type="ha:PostMessageRequest"/>
+			<xsi:complexType name="PostMessageRequest"/>
+			<xsi:element name="PostMessageResponse" type="ha:PostMessageResponse"/>
+			<xsi:complexType name="PostMessageResponse"/>
 		</xsi:schema>
 	</wsdl:types>
 	<wsdl:message name="GetDateTimeRequest">
@@ -189,6 +199,12 @@
 	<wsdl:message name="GetAppliancesResponse">
 		<wsdl:part name="parameter" element="ha:GetAppliancesResponse"/>
 	</wsdl:message>
+	<wsdl:message name="PostMessageRequest">
+		<wsdl:part name="parameter" element="ha:PostMessageRequest"/>
+	</wsdl:message>
+	<wsdl:message name="PostMessageResponse">
+		<wsdl:part name="parameter" element="ha:PostMessageResponse"/>
+	</wsdl:message>
 	<wsdl:portType name="HAPort">
 		<wsdl:operation name="GetDateTime">
 			<wsdl:input message="ha:GetDateTimeRequest"/>
@@ -221,6 +237,10 @@
 		<wsdl:operation name="GetAppliances">
 			<wsdl:input message="ha:GetAppliancesRequest"/>
 			<wsdl:output message="ha:GetAppliancesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="PostMessage">
+			<wsdl:input message="ha:PostMessageRequest"/>
+			<wsdl:output message="ha:PostMessageResponse"/>
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="HASOAP" type="ha:HAPort">
@@ -289,6 +309,15 @@
 			</wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="GetAppliances">
+			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="PostMessage">
 			<soap12:operation soapAction="urn:#NewOperation" soapActionRequired="true"/>
 			<wsdl:input>
 				<soap12:body use="literal"/>
