@@ -11,6 +11,7 @@ service dbRPC
   rpc GetUsers (GetUsersRequest) returns (GetUsersResponse) {}
   rpc UserLogin (UserLoginRequest) returns (UserLoginResponse) {}
   rpc GetMessages (GetMessagesRequest) returns (GetMessagesResponse) {}
+  rpc PostMessage (PostMessageRequest) returns (PostMessageResponse) {}
 }
 
 message HelloRequest
@@ -70,4 +71,20 @@ message GetMessagesResponse
     required string message_content = 5;
   }
   repeated MessageBlock message = 1;
+}
+
+message PostMessageRequest
+{
+  required int32 session_id = 1;
+  required int32 author_id = 2;
+  optional string author_name = 3;
+  optional int32 destination_id = 4;
+  optional string destination_name = 5;
+  required string message_content = 6;
+}
+
+message PostMessageResponse
+{
+  required int32 result = 1;
+  optional string error_text = 2;
 }
