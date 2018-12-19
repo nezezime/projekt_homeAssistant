@@ -220,23 +220,49 @@ public:
                     const ::databaseRPC::PostMessageRequest* request,
                     ::databaseRPC::PostMessageResponse* response) override
   {
-    //set query values
-
     std::string sql_query_message_content = "INSERT INTO messages_content (content_id, content) VALUES (NULL, '";
     sql_query_message_content += request->message_content();
     sql_query_message_content += "')";
 
     //get foregin key for messages table
     //SELECT * FROM messages_content WHERE content = 'La'  ORDER BY content_id DESC LIMIT 1;
-    std::string sql_query_message_content_id = "SELECT ";
+    std::string sql_query_message_content_id = "SELECT * FROM messages_content WHERE content = '";
+    sql_query_message_content_id += request->message_content();
+    sql_query_message_content_id += "' ORDER BY content_id DESC LIMIT 1";
 
-    std::string sql_query_message = "INSERT INTO ";
+    //INSERT INTO `messages` (`message_id`, `author_id`, `timestamp`, `message_content_id`)
+    // VALUES (NULL, '3', '2018-12-19 00:00:00', '31');
+    time_t unix_time = std::time(nullptr);
+    //std::cout << "current time " << static_cast<unsigned int> (unix_time) << std::endl;
+
+    std::string sql_query_message = "INSERT INTO `messages` (`message_id`, `author_id`, `timestamp`, `message_content_id`) VALUES (NULL, '";
+    sql_query_message += std::to_string(request->author_id());
+    sql_query_message += "', '";
+    sql_query_message += std::to_string(static_cast<unsigned int> (unix_time));
+    sql_query_message += "', '";
+
     try
     {
+      //insert message content
       std::auto_ptr<sql::Statement> stmt(sql_connection->createStatement());
       stmt->execute(sql_query_message_content);
 
+      //read the assigned content id
+      AutoSqlStmt auto_sql(sql_connection);
+      auto_sql.executeQuery(sql_query_message_content_id);
 
+      unsigned int content_id;
+      while(auto_sql.result->next())
+      {
+        content_id = auto_sql.result->getUInt("content_id");
+      }
+      std::cout << content_id << std::endl;
+
+      //insert message info bound with corresponding message id
+      sql_query_message += std::to_string(content_id);
+      sql_query_message += "')";
+      //std::cout << sql_query_message << std::endl;
+      stmt->execute(sql_query_message);
     }
     catch(sql::SQLException &e)
     {
