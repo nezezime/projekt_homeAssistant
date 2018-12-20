@@ -169,7 +169,7 @@ public:
 
     if(request->has_from_time())
     {
-      time_t from_time = static_cast<time_t> (request->from_time());
+      unsigned int  from_time = static_cast<unsigned int> (request->from_time());
       std::cout << "GetMessages " << std::to_string(from_time) << std::endl;
       sql_query += " WHERE messages.timestamp > FROM_UNIXTIME(";
       sql_query += std::to_string(from_time);
@@ -180,7 +180,7 @@ public:
     {
       AutoSqlStmt auto_sql(sql_connection);
 
-      std::cout << "query: " << sql_query << std::endl;
+      // std::cout << "query: " << sql_query << std::endl;
       auto_sql.executeQuery(sql_query);
 
       //parse response
