@@ -28,7 +28,7 @@ message HelloReply
 
 message GetUsersRequest
 {
-  required int32 session_id = 1;
+  required uint64 session_id = 1;
 }
 
 message GetUsersResponse
@@ -50,7 +50,7 @@ message UserLoginRequest
 message UserLoginResponse
 {
   required int32 status_code = 1;
-  optional int32 session_id = 2;
+  optional uint64 session_id = 2;
   optional string reason = 3;
   optional int32 user_id = 4;
 }
@@ -58,7 +58,7 @@ message UserLoginResponse
 message GetMessagesRequest
 {
   required int32 user_id = 1;
-  optional int32 from_time = 2;
+  optional uint64 from_time = 2;
 }
 
 message GetMessagesResponse
@@ -66,7 +66,7 @@ message GetMessagesResponse
   message MessageBlock
   {
     required int32 message_id = 1;
-    required int32 message_timestamp = 2;
+    required uint64 message_timestamp = 2;
     required int32 author_id = 3;
     optional string author_name = 4;
     required string message_content = 5;
@@ -76,7 +76,7 @@ message GetMessagesResponse
 
 message PostMessageRequest
 {
-  required int32 session_id = 1;
+  required uint64 session_id = 1;
   required int32 author_id = 2;
   optional string author_name = 3;
   optional int32 destination_id = 4;
