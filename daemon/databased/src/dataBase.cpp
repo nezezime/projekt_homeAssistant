@@ -96,13 +96,21 @@ public:
                               "' AND password ='" + request->password() + "'";
       auto_sql.executeQuery(sql_query);
 
-      // check if only a single entry matches user name and password
+      //check if only a single entry matches user name and password
       if(auto_sql.result->next())
       {
         if(auto_sql.result->getUInt("COUNT(*)") == 1)
         {
           std::cout << "Login success" << std::endl;
           response->set_status_code(0);
+
+          //get logged in user id
+          sql_query = "SELECT uid FROM users WHERE username = '" + request->user_name() + "'";
+          auto_sql.executeQuery(sql_query);
+          while(auto_sql.result->next())
+          {
+            response->set_user_id(auto_sql.result->getUInt("uid"));
+          }
 
           //get next session id from database
           sql_query = "SELECT MAX(session_id) FROM users";
