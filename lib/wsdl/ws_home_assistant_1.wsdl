@@ -76,7 +76,7 @@
 						<xsi:complexType>
 							<xsi:sequence>
 								<xsi:element name="message-id" type="xsi:unsignedInt" minOccurs="0"/>
-								<xsi:element name="message-timestamp" type="xsi:dateTime">
+								<xsi:element name="message-timestamp" type="xsi:unsignedInt">
 									<xsi:annotation>
 										<xsi:documentation>timestamp of when the message was posted</xsi:documentation>
 									</xsi:annotation>
