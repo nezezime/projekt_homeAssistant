@@ -25,7 +25,7 @@ int SoapResponse::fillGetUsers(struct soap *soap,
   return WS_OK;
 }
 
-int SoapResponse::fillUserResponse(struct soap *soap,
+int SoapResponse::fillUserLoginResponse(struct soap *soap,
                                   const databaseRPC::UserLoginResponse &rpc_response,
                                   ha__UserLoginResponse &gsoap_response)
 {
@@ -42,7 +42,14 @@ int SoapResponse::fillUserResponse(struct soap *soap,
       //register a new active session with session manager
       SessionContainer container(*session_id, DEFAULT_SESSION_TIMEOUT);
       session_manager.addSession(container);
-      session_manager.searchSession(*session_id);
+      //session_manager.searchSession(*session_id);
+    }
+
+    if(rpc_response.has_user_id())
+    {
+      int *user_id = static_cast<int *> (soap_malloc(soap, sizeof(int)));
+      *user_id = rpc_response.user_id();
+      gsoap_response.user_id = user_id;
     }
   }
   else

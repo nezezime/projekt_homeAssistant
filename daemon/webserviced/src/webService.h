@@ -56,7 +56,7 @@ namespace SoapResponse
                   const databaseRPC::GetUsersResponse &rpc_response,
                   ha__GetUsersResponse &gsoap_response);
 
-  int fillUserResponse(struct soap *soap,
+  int fillUserLoginResponse(struct soap *soap,
                       const databaseRPC::UserLoginResponse &rpc_response,
                       ha__UserLoginResponse &gsoap_response);
 

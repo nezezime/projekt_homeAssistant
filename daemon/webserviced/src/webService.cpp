@@ -87,7 +87,7 @@ public:
     }
 
     //write results to soap response
-    result = SoapResponse::fillUserResponse(soap, reply, gsoap_response);
+    result = SoapResponse::fillUserLoginResponse(soap, reply, gsoap_response);
     if(result != 0)
     {
       std::cout << "Failed to fill gSOAP response structure with error code " << result << std::endl;
@@ -295,6 +295,9 @@ int HASOAPService::UserLogin(ha__UserLoginRequest *ha__UserLoginRequest_, ha__Us
 {
   int result = 0;
   std::cout << "UserLogin" << std::endl;
+
+  std::cout << "username: " << ha__UserLoginRequest_->user_name << std::endl;
+  std::cout << "passwd: " <<  ha__UserLoginRequest_->password << std::endl;
 
   result = rpc_client_db.RPC_UserLogin(soap,
                                       ha__UserLoginRequest_->user_name,
