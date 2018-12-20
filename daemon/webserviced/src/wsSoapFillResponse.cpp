@@ -94,7 +94,7 @@ int SoapResponse::fillGetMessagesResponse(struct soap *soap,
       message->author_name = author_name;
     }
 
-    message->message_timestamp = static_cast<time_t> (rpc_message.message_timestamp());
+    message->message_timestamp = static_cast<unsigned int> (rpc_message.message_timestamp());
     message->author_id = rpc_message.author_id();
     messages_sequence->message.push_back(*message);
   }

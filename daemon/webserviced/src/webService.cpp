@@ -99,7 +99,7 @@ public:
 
   int RPC_GetMessages(struct soap *soap,
                       int user_id,
-                      time_t *from_time,
+                      unsigned int *from_time,
                       ha__GetMessagesResponse &gsoap_response)
   {
     databaseRPC::GetMessagesRequest request;
@@ -342,6 +342,7 @@ int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, 
     return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "GetMessages authentication error");
   }
 
+  std::cout << *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time << std::endl;
   //TODO get user_id from session manager if missing from request
 
   result = rpc_client_db.RPC_GetMessages(soap,
