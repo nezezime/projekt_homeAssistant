@@ -52,6 +52,7 @@ message UserLoginResponse
   required int32 status_code = 1;
   optional int32 session_id = 2;
   optional string reason = 3;
+  optional int32 user_id = 4;
 }
 
 message GetMessagesRequest
