@@ -3,3 +3,6 @@
 
 # ignore reference wsdl file
 reference_wsdl.wsdl
+
+# ignore node js modules
+/webapp/node_modules/*
