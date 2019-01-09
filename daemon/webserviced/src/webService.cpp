@@ -99,17 +99,14 @@ public:
 
   int RPC_GetMessages(struct soap *soap,
                       int user_id,
-                      unsigned int *from_time,
+                      unsigned int from_time,
                       ha__GetMessagesResponse &gsoap_response)
   {
     databaseRPC::GetMessagesRequest request;
     databaseRPC::GetMessagesResponse reply;
 
     request.set_user_id(user_id);
-    if(from_time != nullptr)
-    {
-      request.set_from_time(*from_time);
-    }
+    request.set_from_time(from_time);
 
     int result = RPC_Request_Execute(request, &reply, &dbRPC::Stub::GetMessages);
     if(result != 0)
@@ -342,12 +339,22 @@ int HASOAPService::GetMessages(ha__GetMessagesRequest *ha__GetMessagesRequest_, 
     return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "GetMessages authentication error");
   }
 
-  std::cout << *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time << std::endl;
   //TODO get user_id from session manager if missing from request
+
+  unsigned int request_from_time;
+  if(ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time == nullptr)
+  {
+    request_from_time = 0;
+  }
+  else
+  {
+    request_from_time = *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time;
+    std::cout << *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time << std::endl;
+  }
 
   result = rpc_client_db.RPC_GetMessages(soap,
                                         *ha__GetMessagesRequest_->__GetMessagesRequest_sequence->user_id,
-                                        ha__GetMessagesRequest_->__GetMessagesRequest_sequence->from_time,
+                                        request_from_time,
                                         ha__GetMessagesResponse_);
   if(result != 0)
   {
