@@ -65,6 +65,15 @@ namespace SoapResponse
                               ha__GetMessagesResponse &gsoap_response);
 }
 
+//helper functions
+namespace WsHelp
+{
+  //checks for forbidden characters in a string to prevent sql injection
+  // @param input: input string to be checked
+  // @param forbidden: forbidden character detected
+  int checkForbiddenChar(const std::string &input, char &forbidden);
+}
+
 //represents an active session
 class SessionContainer
 {
@@ -136,7 +145,6 @@ class SessionManager
     {
       return WS_ERROR_AUTHENTICATION;
     }
-
     return WS_OK;
   }
 

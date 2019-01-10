@@ -177,7 +177,6 @@ void *SoapProcessRequest(void * soap)
   return nullptr;
 }
 
-//global parameters
 //creates a gRPC stub and connect to gRPC channel without SSL
 //CreateCustomChannel adds more configuration options
 ClientDbRPC rpc_client_db(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
@@ -245,6 +244,36 @@ int main(int argc, char **argv)
   return 0;
 }
 
+/************************************ HELPER FUNCTIONS ****************************************/
+int WsHelp::checkForbiddenChar(const std::string &input, char &forbidden)
+{
+  const unsigned int forbidden_list_size = 2;
+  const char forbidden_list[2] = {';', ':'};
+  /*for(unsigned int i=0; i<forbidden_list_size; i++)
+  {
+    std::cout << forbidden_list[i] << std::endl;
+  }
+  */
+  std::cout << "checkForbiddenChar" << std::endl;
+
+  for(unsigned int i=0; i<input.length(); i++)
+  {
+    char c = input[i];
+    for(unsigned int j=0; j<forbidden_list_size; j++)
+    {
+      char forbidden = forbidden_list[j];
+      if(c == forbidden)
+      {
+        std::cout << "Forbidden char " << forbidden << " found" << std::endl;
+        forbidden = forbidden;
+        return WS_ERROR_INVALID_PARAMETERS;
+      }
+    }
+    //std::cout << c << std::endl;
+  }
+
+  return WS_OK;
+}
 
 /************************************ WEBSERVICES METHODS ****************************************/
 int HASOAPService::GetDateTime(const std::string& ha__GetDateTimeRequest, std::string &ha__GetDateTimeResponse)
@@ -291,23 +320,33 @@ int HASOAPService::GetUsers(ha__GetUsersRequest *ha__GetUsersRequest_, ha__GetUs
 int HASOAPService::UserLogin(ha__UserLoginRequest *ha__UserLoginRequest_, ha__UserLoginResponse &ha__UserLoginResponse_)
 {
   int result = 0;
+  char forbidden;
   std::cout << "UserLogin" << std::endl;
 
-  std::cout << "username: " << ha__UserLoginRequest_->user_name << std::endl;
-  std::cout << "passwd: " <<  ha__UserLoginRequest_->password << std::endl;
+  std::string username = ha__UserLoginRequest_->user_name;
+  std::string password = ha__UserLoginRequest_->password;
 
-  result = rpc_client_db.RPC_UserLogin(soap,
-                                      ha__UserLoginRequest_->user_name,
-                                      ha__UserLoginRequest_->password,
-                                      ha__UserLoginResponse_);
+  std::cout << "username: " << username << std::endl;
+  std::cout << "passwd: " << password << std::endl;
+
+  //prevent SQL injection
+  result = WsHelp::checkForbiddenChar(username, forbidden);
+  if(result != WS_OK)
+  {
+    return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "UserLogin character not allowed");
+  }
+  result = WsHelp::checkForbiddenChar(password, forbidden);
+  if(result != WS_OK)
+  {
+    return soap_receiver_fault(soap, WS_ERROR_AUTHENTICATION_TEXT, "UserLogin character not allowed");
+  }
+
+  result = rpc_client_db.RPC_UserLogin(soap, username, password, ha__UserLoginResponse_);
   if(result != 0)
   {
     std::cout << "GetUsers RPC error" << std::endl;
     return WS_ERROR_RPC;
   }
-
-  //TODO read data from soap in a way that prevents sql injection
-
 
   return WS_OK;
 }
