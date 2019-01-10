@@ -171,16 +171,20 @@ public:
     {
       unsigned int  from_time = static_cast<unsigned int> (request->from_time());
       std::cout << "GetMessages " << std::to_string(from_time) << std::endl;
-      sql_query += " WHERE messages.timestamp > FROM_UNIXTIME(";
+      sql_query += " WHERE messages.timestamp > ";
       sql_query += std::to_string(from_time);
-      sql_query += ")";
+      sql_query += ";";
+      //if message timestamp is a datetime field in the database
+      //sql_query += " WHERE messages.timestamp > FROM_UNIXTIME(";
+      //sql_query += std::to_string(from_time);
+      //sql_query += ")";
     }
 
     try
     {
       AutoSqlStmt auto_sql(sql_connection);
 
-      // std::cout << "query: " << sql_query << std::endl;
+      //std::cout << "query: " << sql_query << std::endl;
       auto_sql.executeQuery(sql_query);
 
       //parse response
@@ -228,20 +232,20 @@ public:
                     const ::databaseRPC::PostMessageRequest* request,
                     ::databaseRPC::PostMessageResponse* response) override
   {
-    std::string sql_query_message_content = "INSERT INTO messages_content (content_id, content) VALUES (NULL, '";
+    std::string sql_query_message_content = "INSERT INTO messages_content (content_id, content) VALUES (NULL, \"";
     sql_query_message_content += request->message_content();
-    sql_query_message_content += "')";
+    sql_query_message_content += "\")";
 
     //get foregin key for messages table
     //SELECT * FROM messages_content WHERE content = 'La'  ORDER BY content_id DESC LIMIT 1;
-    std::string sql_query_message_content_id = "SELECT * FROM messages_content WHERE content = '";
+    std::string sql_query_message_content_id = "SELECT * FROM messages_content WHERE content = \"";
     sql_query_message_content_id += request->message_content();
-    sql_query_message_content_id += "' ORDER BY content_id DESC LIMIT 1";
+    sql_query_message_content_id += "\" ORDER BY content_id DESC LIMIT 1";
 
     //INSERT INTO `messages` (`message_id`, `author_id`, `timestamp`, `message_content_id`)
     // VALUES (NULL, '3', '2018-12-19 00:00:00', '31');
     time_t unix_time = std::time(nullptr);
-    //std::cout << "current time " << static_cast<unsigned int> (unix_time) << std::endl;
+    std::cout << "current time " << static_cast<unsigned int> (unix_time) << std::endl;
 
     std::string sql_query_message = "INSERT INTO `messages` (`message_id`, `author_id`, `timestamp`, `message_content_id`) VALUES (NULL, '";
     sql_query_message += std::to_string(request->author_id());
@@ -252,12 +256,15 @@ public:
     try
     {
       //insert message content
+      std::cout << sql_query_message_content << std::endl;
       std::auto_ptr<sql::Statement> stmt(sql_connection->createStatement());
       stmt->execute(sql_query_message_content);
+      std::cout << "success" << std::endl;
 
       //read the assigned content id
       AutoSqlStmt auto_sql(sql_connection);
       auto_sql.executeQuery(sql_query_message_content_id);
+      std::cout << "success" << std::endl;
 
       unsigned int content_id;
       while(auto_sql.result->next())
@@ -269,7 +276,7 @@ public:
       //insert message info bound with corresponding message id
       sql_query_message += std::to_string(content_id);
       sql_query_message += "')";
-      //std::cout << sql_query_message << std::endl;
+      std::cout << sql_query_message << std::endl;
       stmt->execute(sql_query_message);
     }
     catch(sql::SQLException &e)
