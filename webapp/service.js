@@ -12,7 +12,6 @@ app.use(bodyParser.urlencoded({ extended: true })); //parse POST body
 //updated on login
 var soapSessionId = -1;
 var soapUserId = 4;
-var soapUserList = []; //TODO update on login
 
 var wsdlPath = "../lib/wsdl/ws_home_assistant_1.wsdl";
 var soapOptions = {endpoint: "http://192.168.1.15:26000"};
@@ -87,6 +86,24 @@ function soapUserLogout(sessionId) {
   });
 }
 
+function soapPostMessage(sessionId, authorId, messageContent) {
+  return new Promise(function(resolve, reject) {
+    var soapMethod = soapClient[service][binding]['PostMessage'];
+    var paramsPostMessage = {
+      PostMessageRequest: {
+        'session-id': sessionId,
+        'author-id': authorId,
+        'content': messageContent
+      }
+    };
+
+    soapMethod(paramsPostMessage, function(err, result, envelope, soapHeader) {
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+
 /////////////// ROUTER ///////////////////////////////
 router.use(function (req, res, next) {
   console.log("/" + req.method);
@@ -94,8 +111,24 @@ router.use(function (req, res, next) {
   next();
 });
 
-router.get("/", function(req, res){
+router.get("/", function(req, res) {
   res.sendFile(path + "index.html");
+});
+
+router.post("/post_msg", function(req, res) {
+  console.log(req.body);
+
+  //send storage request via soap
+  soapPostMessage(soapSessionId, soapUserId, req.body.message)
+  .then(function(result) {
+    if(parseInt(result) == 0) {
+      console.log("message post successful");
+      res.redirect("/messages");
+    } else {
+      console.log("message post error");
+    }
+  })
+  .catch();
 });
 
 router.post("/check", function(req, res, next) {
@@ -110,7 +143,6 @@ router.post("/check", function(req, res, next) {
       console.log("LOGIN SUCCESS");
 
       //TODO return session cookie
-      //TODO update list of users
 
       res.redirect("/messages");
     } else {
@@ -157,16 +189,29 @@ router.get("/messages", function(req, res) {
   .then(function(result) {
     //parse response and generate html
     console.log(result);
-    //console.log(typeof(result));
     tmpGlobal = tmpGlobal + 1;
-    for(var val in result) {
-      message = result[val];
+
+    //display results with decreasing timestamp
+    var keys = new Array();
+    for(var k in result) {
+      keys.unshift(k);
+    }
+
+    //for(var val in result) {
+    for(var keysLen = keys.length, i=0; i<keysLen; i++) {
+      //message = result[val];
+      message = result[keys[i]];
       res.write('<div class="row"><div class="col-sm-2"><p>');
-      var date = new Date(message['message-timestamp']);
+      var date = new Date(message['message-timestamp']*1000);
+      var month = date.getMonth() + 1;
       var minutes = '0' + date.getMinutes();
       var seconds = '0' + date.getSeconds();
-      res.write(date.getHours() + ':' + minutes.substr(-2) + ':' + seconds.substr(-2));
-
+      res.write(date.getDate() + '.' +
+                month + '.' +
+                date.getFullYear() + ' ' +
+                date.getHours() + ':' +
+                minutes.substr(-2) + ':' +
+                seconds.substr(-2));
       res.write('</p></div>');
       res.write('<div class="col-sm-2"><p>');
       res.write(message['author-name'] + tmpGlobal);

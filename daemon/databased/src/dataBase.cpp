@@ -173,18 +173,19 @@ public:
       std::cout << "GetMessages " << std::to_string(from_time) << std::endl;
       sql_query += " WHERE messages.timestamp > ";
       sql_query += std::to_string(from_time);
-      sql_query += ";";
       //if message timestamp is a datetime field in the database
       //sql_query += " WHERE messages.timestamp > FROM_UNIXTIME(";
       //sql_query += std::to_string(from_time);
       //sql_query += ")";
     }
 
+    sql_query += " ORDER BY messages.timestamp";
+
     try
     {
       AutoSqlStmt auto_sql(sql_connection);
 
-      //std::cout << "query: " << sql_query << std::endl;
+      std::cout << "query: " << sql_query << std::endl;
       auto_sql.executeQuery(sql_query);
 
       //parse response
@@ -197,11 +198,12 @@ public:
         message->set_author_id(auto_sql.result->getUInt("author_id"));
 
         //convert message timestamp to unix timestamp
-        std::istringstream ss (auto_sql.result->getString("timestamp"));
-        std::tm time_struct;
-        ss >> std::get_time(&time_struct, "%Y-%m-%d %H:%M:%S");
-        time_t message_unix_timestamp = mktime(&time_struct);
-        message->set_message_timestamp(static_cast<unsigned int> (message_unix_timestamp));
+        //std::istringstream ss (auto_sql.result->getString("timestamp"));
+        //std::tm time_struct;
+        //ss >> std::get_time(&time_struct, "%Y-%m-%d %H:%M:%S");
+        //time_t message_unix_timestamp = mktime(&time_struct);
+        //message->set_message_timestamp(static_cast<unsigned int> (message_unix_timestamp));
+        message->set_message_timestamp(static_cast<unsigned int> (auto_sql.result->getUInt("timestamp")));
 
         //std::cout << auto_sql.result->getString("content") << std::endl;
         //std::cout << auto_sql.result->getUInt("message_id") << std::endl;
