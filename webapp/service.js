@@ -67,6 +67,22 @@ function soapUserLogin(userName, userPassword) {
   });
 }
 
+function soapUserLogout(sessionId) {
+  return new Promise(function(resolve, reject) {
+    var soapMethod = soapClient[service][binding]['UserLogout'];
+    var paramsUserLogout = {
+      UserLogoutRequest: {
+        'session-id': sessionId
+      }
+    };
+
+    soapMethod(paramsUserLogout, function(err, result, envelope, soapHeader) {
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+
 //definition of Router middle layer
 //this is executed before any other route
 router.use(function (req, res, next) {
@@ -104,7 +120,7 @@ router.post("/check", function(req, res, next) {
   });
 });
 
-router.get("/new_message", function(req, res){
+router.get("/new_message", function(req, res) {
   res.sendFile(path + "new_message.html");
 });
 
@@ -160,6 +176,17 @@ router.get("/messages", function(req, res) {
   })
   .catch(function() {
     console.log("GetMessages error");
+  });
+});
+
+router.get("/logout", function(req, res) {
+  soapUserLogout(soapSessionId)
+  .then(function(result) {
+    console.log("user logged out");
+    res.sendFile(path + "logout.html");
+  })
+  .catch(function() {
+    console.log("UserLogout error");
   });
 });
 
