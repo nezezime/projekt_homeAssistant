@@ -5,13 +5,17 @@ var fs = require('fs');
 var soap = require('strong-soap').soap;
 var bodyParser = require('body-parser');
 var session = require('client-sessions');
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); //parse POST body
 
 //soap client init
-var wsdlPath = "../lib/wsdl/ws_home_assistant_1.wsdl";
-var soapOptions = {endpoint: "http://192.168.1.15:26000"};
+
+//updated on login
 var soapSessionId = -1;
 var soapUserId = 4;
+var soapUserList = []; //TODO update on login
+
+var wsdlPath = "../lib/wsdl/ws_home_assistant_1.wsdl";
+var soapOptions = {endpoint: "http://192.168.1.15:26000"};
 var service = 'HAServices';
 var binding = 'HASOAP';
 var tmpGlobal = 0;
@@ -22,7 +26,7 @@ soap.createClient(wsdlPath, soapOptions, function(err, client) {
   soapClient = client;
 });
 
-//__dirname points to current working directory
+//path to html files
 var path = __dirname + '/views/';
 console.log("path to views: " + path);
 
@@ -83,15 +87,13 @@ function soapUserLogout(sessionId) {
   });
 }
 
-//definition of Router middle layer
-//this is executed before any other route
+/////////////// ROUTER ///////////////////////////////
 router.use(function (req, res, next) {
   console.log("/" + req.method);
   //allows the Router to get executed
   next();
 });
 
-//TODO make this a login page
 router.get("/", function(req, res){
   res.sendFile(path + "index.html");
 });
@@ -104,9 +106,11 @@ router.post("/check", function(req, res, next) {
   .then(function(result) {
     if(parseInt(result['status-code']) == 0) {
       soapSessionId = result['session-id'];
+      soapUserId = result['user-id'];
       console.log("LOGIN SUCCESS");
 
-      //return session cookie
+      //TODO return session cookie
+      //TODO update list of users
 
       res.redirect("/messages");
     } else {
