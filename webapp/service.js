@@ -5,19 +5,25 @@ var fs = require('fs');
 var soap = require('strong-soap').soap;
 var bodyParser = require('body-parser');
 var session = require('client-sessions');
-app.use(bodyParser.urlencoded({ extended: true })); //parse POST body
 
-//soap client init
+//configure middleware
+app.use(bodyParser.urlencoded({ extended: true })); //parse POST body
+app.use(session({
+  cookieName: 'session',
+  secret: "18LUMIClIVYtnr11TvEM",
+  duration: 30*60*1000,
+  activeDuration: 5*60*1000
+}));
 
 //updated on login
 var soapSessionId = -1;
 var soapUserId = 4;
 
+//soap client init
 var wsdlPath = "../lib/wsdl/ws_home_assistant_1.wsdl";
 var soapOptions = {endpoint: "http://192.168.1.15:26000"};
 var service = 'HAServices';
 var binding = 'HASOAP';
-var tmpGlobal = 0;
 
 console.log("Loading wsdl from file: " + wsdlPath);
 var soapClient;
@@ -119,7 +125,7 @@ router.post("/post_msg", function(req, res) {
   console.log(req.body);
 
   //send storage request via soap
-  soapPostMessage(soapSessionId, soapUserId, req.body.message)
+  soapPostMessage(req.session.user.sessionId, req.session.user.userId, req.body.message)
   .then(function(result) {
     if(parseInt(result) == 0) {
       console.log("message post successful");
@@ -138,6 +144,12 @@ router.post("/check", function(req, res, next) {
   soapUserLogin(req.body.username, req.body.password)
   .then(function(result) {
     if(parseInt(result['status-code']) == 0) {
+      user = {
+        userName: req.body.username,
+        userId: result['user-id'],
+        sessionId: result['session-id']
+      };
+      req.session.user = user;
       soapSessionId = result['session-id'];
       soapUserId = result['user-id'];
       console.log("LOGIN SUCCESS");
@@ -183,14 +195,16 @@ router.get("/test", function(req, res) {
 router.get("/messages", function(req, res) {
   var htmlData = readHtmlFile(path + "messages.html");
   res.write(htmlData);
+  res.write(req.session.user.userName);
+  res.write(", here are your messages:</h1></div></div></div></div>");
+  res.write("<div class='container'><div class='row'><div class='col-sm-2'><h3>Time</h3></div>");
+  res.write("<div class='col-sm-2'><h3>Author</h3></div>");
+  res.write("<div class='col-sm-8'><h3>Message</h3></div></div>");
 
   //fetch messages using soap
-  soapGetMessages(soapSessionId, soapUserId)
+  soapGetMessages(req.session.user.sessionId, req.session.user.userId)
   .then(function(result) {
     //parse response and generate html
-    console.log(result);
-    tmpGlobal = tmpGlobal + 1;
-
     //display results with decreasing timestamp
     var keys = new Array();
     for(var k in result) {
@@ -201,7 +215,7 @@ router.get("/messages", function(req, res) {
     for(var keysLen = keys.length, i=0; i<keysLen; i++) {
       //message = result[val];
       message = result[keys[i]];
-      res.write('<div class="row"><div class="col-sm-2"><p>');
+      res.write('<div class="row"><hr/><div class="col-sm-2"><p>');
       var date = new Date(message['message-timestamp']*1000);
       var month = date.getMonth() + 1;
       var minutes = '0' + date.getMinutes();
@@ -214,7 +228,7 @@ router.get("/messages", function(req, res) {
                 seconds.substr(-2));
       res.write('</p></div>');
       res.write('<div class="col-sm-2"><p>');
-      res.write(message['author-name'] + tmpGlobal);
+      res.write(message['author-name']);
       res.write('</p></div>');
 
       res.write('<div class="col-sm-8"><p>');
@@ -229,7 +243,7 @@ router.get("/messages", function(req, res) {
 });
 
 router.get("/logout", function(req, res) {
-  soapUserLogout(soapSessionId)
+  soapUserLogout(req.session.user.sessionId)
   .then(function(result) {
     console.log("user logged out");
     res.sendFile(path + "logout.html");
