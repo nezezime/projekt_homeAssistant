@@ -92,8 +92,8 @@ public:
     try
     {
       AutoSqlStmt auto_sql(sql_connection);
-      std::string sql_query = "SELECT COUNT(*) FROM users WHERE username = '" + request->user_name() +
-                              "' AND password ='" + request->password() + "'";
+      std::string sql_query = "SELECT COUNT(*) FROM users WHERE BINARY username = '" + request->user_name() +
+                              "' AND BINARY password ='" + request->password() + "'";
       auto_sql.executeQuery(sql_query);
 
       //check if only a single entry matches user name and password
@@ -105,7 +105,7 @@ public:
           response->set_status_code(0);
 
           //get logged in user id
-          sql_query = "SELECT uid FROM users WHERE username = '" + request->user_name() + "'";
+          sql_query = "SELECT uid FROM users WHERE BINARY username = '" + request->user_name() + "'";
           auto_sql.executeQuery(sql_query);
           while(auto_sql.result->next())
           {
@@ -122,7 +122,7 @@ public:
 
             //store assigned sesion id
             sql_query = "UPDATE users SET session_id = " + std::to_string(session_id) +
-                        " WHERE username = '" + request->user_name() + "'";
+                        " WHERE BINARY username = '" + request->user_name() + "'";
             std::cout << sql_query << std::endl;
             std::cout << "assigned session id " << session_id << " to user "
                       << request->user_name() << std::endl;
@@ -185,7 +185,7 @@ public:
     {
       AutoSqlStmt auto_sql(sql_connection);
 
-      std::cout << "query: " << sql_query << std::endl;
+      //std::cout << "query: " << sql_query << std::endl;
       auto_sql.executeQuery(sql_query);
 
       //parse response
