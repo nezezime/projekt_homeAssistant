@@ -13,7 +13,7 @@ Currently includes 2 separate components, webserviced and database. The former i
 There is a NodeJS server which employs a strong-soap module which allows it to act as a SOAP client and a regular web server to the web application. The application allows the users to each have their own session. User credentials are shared between web and android application. Currently supports only messaging.
 
 ### Android application
-Users log into the application using their credentials. Besides messaging, the application allows the user to view weather forecast (geolocation can be used) and the arrival times of LPP (Ljubljana public transport) busses. 
+Users log into the application using their credentials. Besides messaging, the application allows the user to view weather forecast (geolocation can be used) and the arrival times of LPP (Ljubljana public transport) busses. Ksoap 2 library is used as to provide a SOAP client.
 
 ### Installation
 - install the gSOAP library, mysql C++ JDBC connector, gRPC and protocol buffers. The links are provided above, all the libraries have been successfully installed on a Fedora Workstation 28 system
