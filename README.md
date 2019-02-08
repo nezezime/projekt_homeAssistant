@@ -16,7 +16,6 @@ There is a NodeJS server which employs a strong-soap module which allows it to a
 Users log into the application using their credentials. Besides messaging, the application allows the user to view weather forecast (geolocation can be used) and the arrival times of LPP (Ljubljana public transport) busses. 
 
 ### Installation
-##### Web service
 - install the gSOAP library, mysql C++ JDBC connector, gRPC and protocol buffers. The links are provided above, all the libraries have been successfully installed on a Fedora Workstation 28 system
 - WSDL file which is used to specify the SOAP webservices is located in lib/wsdl. Should the gSOAP installation be successful webserviced can be compiled using the *make* in the webserviced folder
 - install NodeJS on the server. Additional node modules can be installed using the NPM (node package manager). Use the *npm install + packagename* command:
