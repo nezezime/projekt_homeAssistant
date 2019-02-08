@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/trola_fragment_layout">
+
+    <!--<TextView
+        android:id="@+id/section_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bla" />-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/trola_ime_postaje"
+
+        android:text="@string/trola_ime_postaje"
+        android:textSize="35sp"
+
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp" />
+        <!--android:layout_below="@id/section_label"-->
+
+    <TextView
+        android:id="@+id/trola_smer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="@string/trola_smer_center"
+        android:textSize="15sp"
+
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_above="@id/trola_prihod_tag"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/trola_linija_tag"
+
+        android:text="@string/trola_linija"
+        android:textSize="20sp"
+
+        android:layout_below="@id/trola_ime_postaje"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/trola_prihod_tag"
+
+        android:text="@string/trola_cas_prihoda"
+        android:textSize="20sp"
+
+        android:layout_below="@id/trola_ime_postaje"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/trola_table_spacer"
+
+        android:background="#000000"
+
+        android:layout_below="@id/trola_linija_tag"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/trola_fragment_table"
+
+        android:layout_below="@+id/trola_table_spacer"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+
+        android:stretchColumns="1">
+    </TableLayout>
+
+</RelativeLayout>

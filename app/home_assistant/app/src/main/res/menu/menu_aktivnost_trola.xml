@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="si.uni_lj.fe.tnuv.projekt_tnuv.aktivnost_trola">
+
+    <item
+        android:id="@+id/trola_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:title="Osveži podatke"
+        app:showAsAction="ifRoom" />
+</menu>

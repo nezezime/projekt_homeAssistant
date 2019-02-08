@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <!--
+        ikone dobim na design.google.icons
+    -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/pokazi_vreme"
+            android:icon="@drawable/ic_vreme"
+            android:title="Vreme" />
+        <item
+            android:id="@+id/pokazi_avtobus"
+            android:icon="@drawable/ic_avtobus"
+            android:title="Avtobusi" />
+        <item
+            android:id="@+id/novo_sporocilo"
+            android:icon="@drawable/ic_question_answer"
+            android:title="Novo sporočilo" />
+        <item
+            android:id="@+id/odjava"
+            android:icon = "@drawable/close"
+            android:title="Odjava" />
+    </group>
+
+
+</menu>

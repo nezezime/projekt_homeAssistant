@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Home assistant</string>
+    <string name="support_address">support@home-assistant.com</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="str_vreme_trenutno">Trenutni vremenski podatki:</string>
+    <string name="str_vreme_napoved">Vremenska napoved:</string>
+    <string name="degreesCelsiusStr">°C</string>
+    <string name="weather_api_call_timestamp">weather_api_call_timestamp</string>
+    <string name="title_activity_aktivnost_trola">Avtobusi</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_aktivnost_vreme">Vreme</string>
+    <string name="weather_location_timestamp">weather_location_timestamp</string>
+    <string name="weather_location_latitude">weather_location_latitude</string>
+    <string name="weather_location_longitude">weather_location_longitude</string>
+    <string name="dummy_string">This is a dummy string.</string>
+    <string name="uporabi_gps">Uporabi GPS za določanje vremenskih razmer</string>
+    <string name="opis_vremenskih_razmer">Opis vremenskih razmer</string>
+    <string name="temperatura">Temperatura</string>
+    <string name="opis_vreme_trenutno">Ikona, ki opisuje trenutne vremenske razmere</string>
+    <string name="opis_vreme_napoved">Ikona, ki opisuje vremensko napoved</string>
+    <string name="letter">Ž</string>
+    <string name="new_message_izberi_avtorja">Izberi avtorja:</string>
+    <string name="new_message_vnesi_besedilo">Vnesi besedilo:</string>
+    <string name="new_message_hint">Vnos sporočila</string>
+    <string name="trola_ime_postaje">Tržnica moste</string>
+    <string name="trola_smer_center">smer: Center</string>
+    <string name="trola_linija">linija</string>
+    <string name="trola_cas_prihoda">čas prihoda v minutah</string>
+    <string name="menu_message_detail_izbris">Izbriši sporočilo</string>
+    <string name="title_activity_login">login</string>
+    <string name="login_username">Uporabniško ime</string>
+    <string name="login_password">Geslo</string>
+    <string name="login_prijava">PRIJAVA</string>
+</resources>

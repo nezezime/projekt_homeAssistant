@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/vreme_kraj"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:textSize="25sp"
+        android:text="@string/dummy_string"
+        />
+
+    <TextView
+        android:id="@+id/vreme_trenutno_tekst"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:textSize="20sp"
+        android:layout_below="@id/vreme_kraj"
+        android:text="@string/str_vreme_trenutno"
+         />
+
+
+    <ImageView
+        android:id="@+id/vreme_trenutno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/opis_vreme_trenutno"
+        android:layout_alignRight="@id/vreme_trenutno_tekst"
+        android:layout_alignLeft="@id/vreme_trenutno_tekst"
+        android:layout_alignStart="@id/vreme_trenutno_tekst"
+        android:layout_alignTop="@+id/vreme_trenutno_temperatura"
+        android:src="@drawable/vreme_800_jasno"/>
+
+    <TextView
+        android:id="@id/vreme_trenutno_temperatura"
+        android:layout_width="wrap_content"
+        android:layout_height="62dp"
+        android:gravity="end"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/vreme_trenutno_tekst"
+        android:textSize="50sp"
+        android:text="@string/temperatura" />
+
+    <TextView
+        android:id="@+id/vreme_trenutno_opis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/vreme_trenutno_temperatura"
+        android:text="@string/opis_vremenskih_razmer" />
+
+    <TextView
+        android:id="@+id/vreme_napoved_tekst"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="13dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/vreme_trenutno"
+        android:textSize="20sp"
+        android:text="@string/str_vreme_napoved"/>
+
+    <ImageView
+        android:id="@+id/vreme_napoved"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/opis_vreme_napoved"
+        android:layout_alignLeft="@+id/vreme_napoved_tekst"
+        android:layout_alignStart="@+id/vreme_napoved_tekst"
+        android:layout_alignTop="@+id/vreme_napoved_temperatura"
+        android:src="@drawable/vreme_800_jasno"/>
+
+    <TextView
+        android:id="@+id/vreme_napoved_temperatura"
+        android:layout_width="wrap_content"
+        android:layout_height="62dp"
+        android:gravity="end"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/vreme_napoved_tekst"
+        android:textSize="50sp"
+        android:text="@string/temperatura" />
+
+    <TextView
+        android:id="@+id/vreme_napoved_opis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginEnd="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginBottom="13dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/vreme_napoved_temperatura"
+        android:text="@string/opis_vremenskih_razmer" />
+
+    <Switch
+        android:id="@+id/vreme_gps_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/vreme_napoved"
+        android:layout_alignStart="@+id/vreme_napoved"
+        android:layout_below="@+id/vreme_napoved_opis"
+        android:layout_marginRight="13dp"
+        android:layout_marginEnd="13dp"
+        android:text="@string/uporabi_gps" />
+
+    <Button
+        android:id="@+id/soap_test_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/vreme_napoved"
+        android:layout_alignStart="@+id/vreme_napoved"
+        android:layout_below="@+id/vreme_gps_switch"
+        android:layout_marginRight="13dp"
+        android:layout_marginEnd="13dp"
+        android:text="test soap klic" />
+
+</RelativeLayout>

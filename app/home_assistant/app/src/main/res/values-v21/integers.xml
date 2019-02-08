@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="weather_api_default_timestamp">0</integer>
+</resources>
