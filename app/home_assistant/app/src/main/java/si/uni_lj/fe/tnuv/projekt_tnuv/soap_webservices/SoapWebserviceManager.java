@@ -233,7 +233,6 @@ public class SoapWebserviceManager {
         }
 
         //update users table
-        //TODO this only updates existing users - new users should be added
         for(int i=0; i<usernames.size(); i++) {
             storageManager.updateUserDatabase(storageManager.setAllUserRowValues(usernames.get(i),
                                                                                 0xFF0000FF,
