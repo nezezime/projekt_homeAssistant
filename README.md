@@ -17,7 +17,7 @@ Users log into the application using their credentials. Besides messaging, the a
 
 ### Installation
 - install the gSOAP library, mysql C++ JDBC connector, gRPC and protocol buffers. The links are provided above, all the libraries have been successfully installed on a Fedora Workstation 28 system
-- WSDL file which is used to specify the SOAP webservices is located in lib/wsdl. Should the gSOAP installation be successful webserviced can be compiled using the *make* in the webserviced folder
+- WSDL file which is used to specify the SOAP webservices is located in lib/wsdl. Should the gSOAP installation be successful webserviced can be compiled using *make* in the webserviced folder
 - install NodeJS on the server. Additional node modules can be installed using the NPM (node package manager). Use the *npm install + packagename* command:
   - strong-soap
   - express
@@ -27,10 +27,7 @@ Users log into the application using their credentials. Besides messaging, the a
  - *apk* for android application is available here:  https://drive.google.com/open?id=19sqqVIfllgRsH93IadPtntBb0FuTOE8l
 
 ### Folder structure
-homeAssistant
- |-- app
- |-- daemon
-      |-- webserviced
-      |-- databased
- |-- lib
- |-- webapp
+- app/: Android mobile application in a form of an Android Studio project
+- daemon/: C++ source code of webserviced and databased
+- lib/: .wsdl file for SOAP webservices specification and .proto file for RPC message specification
+- webapp/: NodeJS web application source code
