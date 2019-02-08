@@ -23,5 +23,5 @@ Users log into the application using their credentials. Besides messaging, the a
   - express
   - client-sessions
   - body-parser
- - make sure that firewall is configured to allow traffic to the NodeJS server (usually port 80)
+ - make sure that firewall is configured to allow traffic to the NodeJS server (usually port 80) and SOAP server
  - *apk* for android application is available here:  https://drive.google.com/open?id=19sqqVIfllgRsH93IadPtntBb0FuTOE8l
